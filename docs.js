@@ -1,24 +1,29 @@
 // ═══════════════════════════════════════════════════════════
-//  UniBarTech — docs.js
-//  Compatible con Firebase Realtime DB + Firebase Storage
+//  UniBarTech — docs.js  (Base64, sin Firebase Storage)
 // ═══════════════════════════════════════════════════════════
 
-// ── Variables globales ──
 let globalData = { folders: [], documents: [] };
 
-// ── Escuchar Firebase en tiempo real ──
+// ── Escuchar Firebase (sin cargar dataUrl para no saturar) ──
 function initFirebaseListeners() {
   firebase.database().ref('unibartech').on('value', snap => {
     const val = snap.val() || {};
-    const foldersObj   = val.folders   || {};
-    const docsObj      = val.documents || {};
 
-    globalData.folders = Object.entries(foldersObj)
+    globalData.folders = Object.entries(val.folders || {})
       .map(([id, f]) => ({ id, ...f }))
       .sort((a, b) => (a.ts || 0) - (b.ts || 0));
 
-    globalData.documents = Object.entries(docsObj)
-      .map(([id, d]) => ({ id, ...d }))
+    globalData.documents = Object.entries(val.documents || {})
+      .map(([id, d]) => ({
+        id,
+        name:     d.name,
+        desc:     d.desc,
+        author:   d.author,
+        folderId: d.folderId,
+        size:     d.size,
+        ts:       d.ts,
+        hasFile:  !!d.dataUrl
+      }))
       .sort((a, b) => (a.ts || 0) - (b.ts || 0));
 
     if (document.getElementById('rootView')) renderPublic();
@@ -28,25 +33,21 @@ function initFirebaseListeners() {
 function getData() { return globalData; }
 
 // ── Utilidades ──
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function escHtml(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function formatDate(ts) {
   if (!ts) return '—';
-  return new Date(ts).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(ts).toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
 }
 function showToast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
+  const t = document.createElement('div'); t.textContent = msg;
   Object.assign(t.style, {
     position:'fixed', bottom:'28px', right:'28px', zIndex:'9999',
     background:'rgba(0,30,60,0.97)', border:'1px solid rgba(0,229,255,0.3)',
     color:'#00EEFF', padding:'14px 22px', borderRadius:'10px',
-    fontFamily:"'Exo 2',sans-serif", fontSize:'0.88rem',
-    boxShadow:'0 4px 24px rgba(0,170,255,0.25)', opacity:'1', transition:'opacity 0.4s'
+    fontFamily:"'Exo 2',sans-serif", fontSize:'0.88rem', opacity:'1', transition:'opacity 0.4s'
   });
   document.body.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
@@ -61,43 +62,50 @@ function fileIcon(name) {
   return m[ext] || '📎';
 }
 
-// ── Ver / Descargar documento (Firebase Storage URL) ──
-function viewDoc(url, name) {
-  if (!url) { alert('Sin archivo adjunto.'); return; }
-  const ext = (name || '').split('.').pop().toLowerCase();
-  if (['pdf','png','jpg','jpeg','gif','webp'].includes(ext)) {
-    window.open(url, '_blank');
-  } else {
-    const a = document.createElement('a');
-    a.href = url; a.download = name || 'documento'; a.target = '_blank';
-    document.body.appendChild(a); a.click(); a.remove();
-  }
-}
-function downloadDoc(url, name) {
-  if (!url) { alert('Sin archivo adjunto.'); return; }
-  const a = document.createElement('a');
-  a.href = url; a.download = name || 'documento'; a.target = '_blank';
-  document.body.appendChild(a); a.click(); a.remove();
+// ── Ver documento (carga dataUrl bajo demanda) ──
+async function viewDoc(docId, docName) {
+  showToast('⏳ Cargando documento...');
+  try {
+    const snap    = await firebase.database().ref('unibartech/documents/' + docId + '/dataUrl').once('value');
+    const dataUrl = snap.val();
+    if (!dataUrl) { alert('Sin archivo adjunto.'); return; }
+    const ext = (docName || '').split('.').pop().toLowerCase();
+    if (['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext)) {
+      const win = window.open('', '_blank');
+      win.document.write('<html><body style="margin:0;background:#111"><iframe src="' + dataUrl + '" style="width:100%;height:100vh;border:none"></iframe></body></html>');
+    } else {
+      const a = document.createElement('a'); a.href = dataUrl; a.download = docName || 'documento'; a.click();
+    }
+  } catch(e) { alert('Error al cargar: ' + e.message); }
 }
 
-// ══════════════════════════════════════════════
-//  VISTA PÚBLICA — documentos.html
-// ══════════════════════════════════════════════
-let currentView = 'root';
+// ── Descargar documento ──
+async function downloadDoc(docId, docName) {
+  showToast('⏳ Preparando descarga...');
+  try {
+    const snap    = await firebase.database().ref('unibartech/documents/' + docId + '/dataUrl').once('value');
+    const dataUrl = snap.val();
+    if (!dataUrl) { alert('Sin archivo adjunto.'); return; }
+    const a = document.createElement('a'); a.href = dataUrl; a.download = docName || 'documento'; a.click();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════
+//  VISTA PÚBLICA
+// ══════════════════════════════════════════════════
+let currentView       = 'root';
 let currentSubFolderId = null;
 
-function goRoot()  { currentView = 'root'; currentSubFolderId = null; renderPublic(); }
-function goMain()  { currentView = 'main'; currentSubFolderId = null; renderPublic(); }
-function openSubFolder(id) { currentView = 'sub'; currentSubFolderId = id; renderPublic(); }
+function goRoot()          { currentView = 'root'; currentSubFolderId = null; renderPublic(); }
+function goMain()          { currentView = 'main'; currentSubFolderId = null; renderPublic(); }
+function openSubFolder(id) { currentView = 'sub';  currentSubFolderId = id;   renderPublic(); }
 
 function renderPublic() {
   const rv = document.getElementById('rootView');
   const mv = document.getElementById('mainView');
   const sv = document.getElementById('subView');
   if (!rv) return;
-  rv.style.display = 'none';
-  mv.style.display = 'none';
-  sv.style.display = 'none';
+  rv.style.display = mv.style.display = sv.style.display = 'none';
   updateBreadcrumb();
   updateRootCount();
   if      (currentView === 'root') rv.style.display = '';
@@ -107,7 +115,7 @@ function renderPublic() {
 
 function updateRootCount() {
   const el = document.getElementById('rootCount'); if (!el) return;
-  const d = getData();
+  const d  = getData();
   const total = d.folders.length + d.documents.filter(doc => !doc.folderId).length;
   el.textContent = total + ' elemento' + (total !== 1 ? 's' : '');
 }
@@ -141,9 +149,9 @@ function renderSubfolders() {
   container.innerHTML = '';
   data.folders.forEach(f => {
     const count = data.documents.filter(d => d.folderId === f.id).length;
-    const row = document.createElement('div');
+    const row   = document.createElement('div');
     row.className = 'sp-row';
-    row.onclick = () => openSubFolder(f.id);
+    row.onclick   = () => openSubFolder(f.id);
     row.innerHTML = `
       <div class="sp-col-name">
         <div class="sp-folder-icon" style="color:${folderColorHex(f.color)}">
@@ -158,8 +166,8 @@ function renderSubfolders() {
       <div class="sp-col-size sp-meta">${count} elemento${count !== 1 ? 's' : ''}</div>`;
     container.appendChild(row);
   });
-  const rootDocs = data.documents.filter(d => !d.folderId);
-  const hasContent = data.folders.length > 0 || rootDocs.length > 0;
+  const rootDocs  = data.documents.filter(d => !d.folderId);
+  const hasContent= data.folders.length > 0 || rootDocs.length > 0;
   if (mainEmpty) mainEmpty.style.display = hasContent ? 'none' : '';
 }
 
@@ -182,7 +190,6 @@ function renderSubDocs() {
 
 function renderDocRow(doc, container) {
   const icon = fileIcon(doc.name);
-  const url  = doc.downloadUrl || doc.dataUrl || '';
   const row  = document.createElement('div');
   row.className = 'sp-row sp-doc-row';
   row.innerHTML = `
@@ -194,9 +201,9 @@ function renderDocRow(doc, container) {
     <div class="sp-col-by sp-meta">${escHtml(doc.author || 'UniBarTech S.A.S')}</div>
     <div class="sp-col-size sp-meta">
       ${doc.size || '—'}
-      ${url ? `
-        <button class="sp-doc-btn" onclick="event.stopPropagation();viewDoc('${url}','${escHtml(doc.name)}')">Ver</button>
-        <button class="sp-doc-btn" onclick="event.stopPropagation();downloadDoc('${url}','${escHtml(doc.name)}')">⬇</button>
+      ${doc.hasFile ? `
+        <button class="sp-doc-btn" onclick="event.stopPropagation();viewDoc('${doc.id}','${escHtml(doc.name)}')">Ver</button>
+        <button class="sp-doc-btn" onclick="event.stopPropagation();downloadDoc('${doc.id}','${escHtml(doc.name)}')">⬇</button>
       ` : ''}
     </div>`;
   container.appendChild(row);
@@ -213,7 +220,7 @@ function searchDocs() {
 // ── Inicializar ──
 document.addEventListener('DOMContentLoaded', async () => {
   initFirebaseListeners();
-  // Crear carpetas por defecto si no existen
+  // Crear carpetas por defecto si Firebase está vacío
   const snap = await firebase.database().ref('unibartech/folders').once('value');
   if (!snap.exists()) {
     const seed = {};
