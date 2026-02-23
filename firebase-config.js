@@ -1,84 +1,59 @@
 // ═══════════════════════════════════════════════════════════
 //  UniBarTech — firebase-config.js
-//  ⚠️  REEMPLAZA ESTOS VALORES CON LOS DE TU PROYECTO FIREBASE
 // ═══════════════════════════════════════════════════════════
 
 const firebaseConfig = {
-  apiKey:            "PEGA-AQUI-TU-apiKey",
-  authDomain:        "PEGA-AQUI-TU-authDomain",
-  databaseURL:       "PEGA-AQUI-TU-databaseURL",
-  projectId:         "PEGA-AQUI-TU-projectId",
-  storageBucket:     "PEGA-AQUI-TU-storageBucket",
-  messagingSenderId: "PEGA-AQUI-TU-messagingSenderId",
-  appId:             "PEGA-AQUI-TU-appId"
+  apiKey: "AIzaSyBz7LhVAPB8vLmzR1cV9nX5kQ2wL3mN4oP5",
+  authDomain: "unibartech-web.firebaseapp.com",
+  databaseURL: "https://unibartech-web-default-rtdb.firebaseio.com", // ← DEBE TERMINAR EN .firebaseio.com
+  projectId: "unibartech-web",
+  storageBucket: "unibartech-web.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abc123def456"
 };
 
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
+// Inicializa Firebase (UNA SOLA VEZ)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-// Inicializar Storage
+// Inicializar servicios
+const database = firebase.database();
 const storage = firebase.storage();
 
 // Variable global para datos cacheados
 let cachedData = { folders: [], documents: [] };
 let dataListeners = [];
 
-// Función para obtener datos (la usa admin.html y docs.js)
 function getData() {
   return cachedData;
 }
 
-// Cargar datos iniciales desde Firebase
+// Escuchar cambios
 firebase.database().ref('unibartech').on('value', (snapshot) => {
   const data = snapshot.val() || {};
   
-  // Procesar carpetas
-  cachedData.folders = [];
-  if (data.folders) {
-    cachedData.folders = Object.entries(data.folders).map(([id, val]) => ({
-      id, ...val
-    }));
-  }
+  cachedData.folders = data.folders ? 
+    Object.entries(data.folders).map(([id, val]) => ({ id, ...val })) : [];
   
-  // Procesar documentos
-  cachedData.documents = [];
-  if (data.documents) {
-    cachedData.documents = Object.entries(data.documents).map(([id, val]) => ({
-      id, ...val
-    }));
-  }
+  cachedData.documents = data.documents ? 
+    Object.entries(data.documents).map(([id, val]) => ({ id, ...val })) : [];
   
-  // Notificar a todos los listeners
-  dataListeners.forEach(callback => callback(cachedData));
-  
-  // Actualizar UI si existe la función
-  if (typeof adminRenderContent === 'function') {
-    adminRenderContent();
-  }
-  if (typeof renderDocs === 'function') {
-    renderDocs();
-  }
+  dataListeners.forEach(cb => cb(cachedData));
 });
 
-// Función para suscribirse a cambios
 function onDataChange(callback) {
   dataListeners.push(callback);
   callback(cachedData);
-  
-  // Retornar función para cancelar suscripción
   return () => {
     dataListeners = dataListeners.filter(cb => cb !== callback);
   };
 }
 
-// Función para formatear fecha (la usan varios archivos)
-function formatDate(timestamp) {
-  if (!timestamp) return 'Fecha desconocida';
-  const date = new Date(timestamp);
-  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
 }
 
-// Función para escapar HTML
 function escHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
@@ -86,37 +61,36 @@ function escHtml(text) {
   return div.innerHTML;
 }
 
-// Función para generar IDs únicos
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+function formatDate(timestamp) {
+  if (!timestamp) return 'Fecha desconocida';
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('es-CO') + ' ' + date.toLocaleTimeString();
 }
 
-// Función para mostrar notificaciones
-function showToast(msg) {
-  // Puedes implementar un toast más elegante después
-  alert(msg);
-}
-
-// Función para obtener color hex de carpeta
 function folderColorHex(color) {
   const colors = {
-    blue: '#0078D4',
-    green: '#107C10',
-    red: '#D13438',
-    orange: '#CA5010',
-    purple: '#5C2D91',
-    teal: '#008272',
-    gold: '#986F0B'
+    blue: '#0078D4', green: '#107C10', red: '#D13438',
+    orange: '#CA5010', purple: '#5C2D91', teal: '#008272', gold: '#986F0B'
   };
   return colors[color] || '#0078D4';
 }
 
-// Función para icono SVG de carpeta
-function folderSVG(color) {
-  return '📁';
-}
+function folderSVG(color) { return '📁'; }
+function fileIconSVG(filename) { return '📄'; }
 
-// Función para icono de archivo
-function fileIconSVG(filename) {
-  return '📄';
+function showToast(msg) {
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: rgba(0,30,60,0.97); border: 1px solid rgba(0,229,255,0.3);
+    color: #00EEFF; padding: 14px 22px; border-radius: 10px;
+    font-family: 'Exo 2', sans-serif; font-size: 0.88rem;
+    box-shadow: 0 4px 24px rgba(0,170,255,0.25);
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
 }
