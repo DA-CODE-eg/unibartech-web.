@@ -250,7 +250,7 @@
     <img src="logo.png" alt="UniBarTech"/>
     <h2>Panel Administrador</h2>
     <p>UniBarTech S.A.S — Acceso restringido</p>
-    <input type="password" id="adminPass" placeholder="admin123" onkeydown="if(event.key==='Enter') checkAdmin()"/>
+    <input type="password" id="adminPass" placeholder="Ingresa la contraseña" onkeydown="if(event.key==='Enter') checkAdmin()"/>
     <button class="btn-primary" style="width:100%" onclick="checkAdmin()">Ingresar →</button>
     <p class="login-error" id="loginError"></p>
   </div>
@@ -369,32 +369,85 @@
 //  LÓGICA EXCLUSIVA DEL PANEL DE ADMIN
 // ════════════════════════════════════════════
 
-let selectedColor     = 'blue';
+// ===== CONFIGURACIÓN =====
+const ADMIN_PASS = "admin123"; // ← CONTRASEÑA CORRECTA: admin123
+let selectedColor = 'blue';
 let adminCurrentFolder = null; // null = raíz
-const ADMIN_PASS = "admin123"; // Cambia esto por tu contraseña
 
-// ── Login / Logout ──────────────────────────
+// ===== FUNCIÓN DE LOGIN CON DEPURACIÓN =====
 function checkAdmin() {
+  // Obtener elementos del DOM
   const input = document.getElementById('adminPass');
   const error = document.getElementById('loginError');
-  if (input.value === ADMIN_PASS) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminDash').style.display = 'block';
-    updateFolderSelect();
-    adminRenderContent();
+  const loginScreen = document.getElementById('loginScreen');
+  const adminDash = document.getElementById('adminDash');
+  
+  // Verificar que los elementos existen
+  if (!input || !error || !loginScreen || !adminDash) {
+    console.error('Error: No se encontraron elementos del DOM');
+    return;
+  }
+  
+  // Obtener valores
+  const passwordIngresada = input.value;
+  const passwordEsperada = ADMIN_PASS;
+  
+  // Mostrar información en consola para depurar
+  console.log('========== INTENTO DE LOGIN ==========');
+  console.log('Contraseña ingresada:', passwordIngresada);
+  console.log('Contraseña esperada:', passwordEsperada);
+  console.log('Longitud ingresada:', passwordIngresada.length);
+  console.log('Longitud esperada:', passwordEsperada.length);
+  console.log('¿Coinciden?', passwordIngresada === passwordEsperada);
+  console.log('======================================');
+  
+  // Comparar contraseñas
+  if (passwordIngresada === passwordEsperada) {
+    // Login exitoso
+    loginScreen.style.display = 'none';
+    adminDash.style.display = 'block';
+    
+    // Actualizar datos
+    if (typeof updateFolderSelect === 'function') updateFolderSelect();
+    if (typeof adminRenderContent === 'function') adminRenderContent();
+    
+    console.log('✅ LOGIN EXITOSO - Bienvenido al panel de administración');
   } else {
+    // Login fallido
     error.textContent = '❌ Contraseña incorrecta';
     input.value = '';
     input.focus();
-    setTimeout(() => error.textContent = '', 3000);
+    
+    // Limpiar mensaje después de 3 segundos
+    setTimeout(() => {
+      error.textContent = '';
+    }, 3000);
+    
+    console.log('❌ LOGIN FALLIDO - Contraseña incorrecta');
   }
 }
 
+// Permitir login con tecla Enter (ya está en el HTML pero lo reforzamos)
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('adminPass');
+  if (input) {
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        checkAdmin();
+      }
+    });
+  }
+  console.log('✅ Panel de administración cargado - Usa la contraseña: admin123');
+});
+
+// ===== LOGOUT =====
 function logoutAdmin() {
   if (confirm('¿Cerrar sesión de administrador?')) {
     document.getElementById('adminDash').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('adminPass').value = '';
+    console.log('👋 Sesión cerrada');
   }
 }
 
