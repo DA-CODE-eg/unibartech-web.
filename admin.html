@@ -359,6 +359,7 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="main.js"></script>
 <script src="docs.js"></script>
@@ -370,6 +371,7 @@
 
 let selectedColor     = 'blue';
 let adminCurrentFolder = null; // null = raíz
+let ADMIN_PASS = "admin123"; // Cambia esto por tu contraseña
 
 // ── Login / Logout ──────────────────────────
 function checkAdmin() {
@@ -380,6 +382,7 @@ function checkAdmin() {
     document.getElementById('adminDash').style.display = 'block';
     isAdmin = true;
     updateFolderSelect();
+    adminRenderContent();
   } else {
     error.textContent = '❌ Contraseña incorrecta';
     input.value = '';
@@ -479,7 +482,7 @@ function renderAdminDocRow(doc, container) {
     ${doc.downloadUrl
       ? `<button class="doc-btn btn-sm" onclick="event.stopPropagation();viewDoc('${doc.downloadUrl}','${escHtml(doc.name)}')" style="font-size:0.7rem;padding:5px 10px">Ver</button>`
       : ''}
-    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}','${escHtml(doc.storagePath||'')}')" title="Eliminar">🗑️</button>
+    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}')" title="Eliminar">🗑️</button>
   `;
   container.appendChild(row);
 }
@@ -530,41 +533,51 @@ async function adminUploadDoc() {
   btn.disabled = true;
   btn.textContent = 'Subiendo...';
   progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressPct.textContent = '0%';
 
   try {
-    const storagePath = 'documentos/' + genId() + '_' + file.name;
-    const storageRef  = firebase.storage().ref(storagePath);
-    const uploadTask  = storageRef.put(file);
-
+    // Subir a Firebase Storage
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child('documentos/' + Date.now() + '_' + file.name);
+    
+    const uploadTask = fileRef.put(file);
+    
     // Escuchar progreso
     await new Promise((resolve, reject) => {
-      uploadTask.on('state_changed',
-        snapshot => {
+      uploadTask.on('state_changed', 
+        (snapshot) => {
           const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
           progressBar.style.width = pct + '%';
           progressPct.textContent = pct + '%';
         },
-        err => reject(err),
-        () => resolve()
+        (error) => reject(error),
+        async () => {
+          // Subida completada, obtener URL
+          const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
+          
+          // Guardar metadata en Realtime Database
+          const docId  = genId();
+          const docRef = firebase.database().ref('unibartech/documents/' + docId);
+          await docRef.set({
+            name: finalName, 
+            desc, 
+            author, 
+            folderId,
+            downloadUrl,
+            size: (file.size / 1048576).toFixed(2) + ' MB', 
+            ts: Date.now()
+          });
+          
+          resolve();
+        }
       );
-    });
-
-    // Obtener URL de descarga pública
-    const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
-    const sizeMB      = (file.size / 1048576).toFixed(2) + ' MB';
-
-    // Guardar metadata en Realtime Database
-    const docId  = genId();
-    const docRef = firebase.database().ref('unibartech/documents/' + docId);
-    await docRef.set({
-      name: finalName, desc, author, folderId,
-      downloadUrl, storagePath,
-      size: sizeMB, ts: Date.now()
     });
 
     // Limpiar formulario
     if (nameEl)   nameEl.value   = '';
     if (descEl)   descEl.value   = '';
+    if (authorEl) authorEl.value = '';
     if (fileEl)   fileEl.value   = '';
     if (fileLabel) fileLabel.textContent = '';
 
@@ -576,9 +589,11 @@ async function adminUploadDoc() {
   } finally {
     btn.disabled = false;
     btn.textContent = 'Subir Documento ↑';
-    progressWrap.style.display = 'none';
-    progressBar.style.width = '0%';
-    progressPct.textContent  = '0%';
+    setTimeout(() => {
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressPct.textContent  = '0%';
+    }, 2000);
   }
 }
 
@@ -591,8 +606,13 @@ async function adminDeleteFolder(id) {
 
   // Eliminar archivos en Storage
   for (const doc of docsInFolder) {
-    if (doc.storagePath) {
-      try { await firebase.storage().ref(doc.storagePath).delete(); } catch(e) {}
+    try {
+      if (doc.downloadUrl) {
+        const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
+        await fileRef.delete();
+      }
+    } catch (e) {
+      console.warn('Error eliminando archivo de Storage:', e);
     }
     await firebase.database().ref('unibartech/documents/' + doc.id).remove();
   }
@@ -603,12 +623,21 @@ async function adminDeleteFolder(id) {
 }
 
 // ── Eliminar documento ──────────────────────
-async function adminDeleteDoc(id, storagePath) {
+async function adminDeleteDoc(id) {
   if (!confirm('¿Eliminar este documento?')) return;
-
-  if (storagePath) {
-    try { await firebase.storage().ref(storagePath).delete(); } catch(e) {}
+  
+  const data = getData();
+  const doc = data.documents.find(d => d.id === id);
+  
+  if (doc && doc.downloadUrl) {
+    try {
+      const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
+      await fileRef.delete();
+    } catch (e) {
+      console.warn('Error eliminando archivo de Storage:', e);
+    }
   }
+  
   await firebase.database().ref('unibartech/documents/' + id).remove();
   showToast('🗑️ Documento eliminado.');
 }
@@ -651,6 +680,49 @@ function updateFileName() {
   const label = document.getElementById('fileLabel');
   if (!input || !label) return;
   label.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
+}
+
+// Funciones auxiliares necesarias
+function escHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return 'Fecha desconocida';
+  const date = new Date(timestamp);
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+}
+
+function folderColorHex(color) {
+  const colors = {
+    blue: '#0078D4',
+    green: '#107C10',
+    red: '#D13438',
+    orange: '#CA5010',
+    purple: '#5C2D91',
+    teal: '#008272',
+    gold: '#986F0B'
+  };
+  return colors[color] || '#0078D4';
+}
+
+function folderSVG(color) {
+  return '📁';
+}
+
+function fileIconSVG(filename) {
+  return '📄';
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function showToast(msg) {
+  alert(msg); // Simplificado, puedes implementar un toast bonito después
 }
 </script>
 </body>
