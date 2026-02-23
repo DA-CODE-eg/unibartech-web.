@@ -1,0 +1,298 @@
+// ═══════════════════════════════════════════════════════════
+//  UniBarTech — docs.js  (Firebase Realtime Database)
+// ═══════════════════════════════════════════════════════════
+
+const ADMIN_PASS = 'Unibar2025!'; // ← cambia esta contraseña
+let isAdmin = false;
+
+// ── Firebase refs ──────────────────────────────────────────
+let db, storage;
+
+// ── Estado global en memoria (actualizado por listener) ────
+let globalData = { folders: [], documents: [] };
+
+// ── Inicializar Firebase + escuchar cambios en tiempo real ─
+function initFirebaseListeners() {
+  db      = firebase.database();
+  storage = firebase.storage();
+
+  // Escucha cualquier cambio en /unibartech/ → actualiza globalData → re-renderiza
+  db.ref('unibartech').on('value', snap => {
+    const val = snap.val() || {};
+
+    const foldersObj = val.folders   || {};
+    const docsObj    = val.documents || {};
+
+    globalData.folders = Object.entries(foldersObj)
+      .map(([id, f]) => ({ id, ...f }))
+      .sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+    globalData.documents = Object.entries(docsObj)
+      .map(([id, d]) => ({ id, ...d }))
+      .sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+    // Re-renderizar según la página actual
+    if (document.getElementById('rootView'))        renderPublic();
+    if (document.getElementById('adminContentRows')) adminRenderContent();
+  });
+}
+
+// ── Leer datos (síncrono, usa caché global) ────────────────
+function getData() {
+  return globalData;
+}
+
+// ── Helpers de ID y formato ────────────────────────────────
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('es-CO', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+}
+
+// ── Colores de carpetas ────────────────────────────────────
+const FOLDER_COLORS = {
+  blue: '#0078D4', green: '#107C10', red: '#D13438',
+  orange: '#CA5010', purple: '#5C2D91', teal: '#008272', gold: '#986F0B',
+};
+function folderColorHex(color) { return FOLDER_COLORS[color] || '#0078D4'; }
+
+function folderSVG(color) {
+  const c = folderColorHex(color);
+  return `<svg viewBox="0 0 24 24" width="100%" height="100%">
+    <path d="M3 7c0-1.1.9-2 2-2h4.17l2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" fill="${c}"/>
+  </svg>`;
+}
+
+function fileIcon(name) {
+  const ext = (name || '').split('.').pop().toLowerCase();
+  const icons = {
+    pdf:  { icon: '📄', color: '#D13438' },
+    doc:  { icon: '📝', color: '#2B579A' }, docx: { icon: '📝', color: '#2B579A' },
+    xls:  { icon: '📊', color: '#217346' }, xlsx: { icon: '📊', color: '#217346' },
+    ppt:  { icon: '📋', color: '#B7472A' }, pptx: { icon: '📋', color: '#B7472A' },
+    txt:  { icon: '📃', color: '#555' },
+    png:  { icon: '🖼️', color: '#0078D4' }, jpg: { icon: '🖼️', color: '#0078D4' },
+    jpeg: { icon: '🖼️', color: '#0078D4' },
+  };
+  return icons[ext] || { icon: '📎', color: '#888' };
+}
+function fileIconSVG(name) {
+  return fileIcon(name).icon;
+}
+
+// ── Ver / abrir documento (URL de Firebase Storage) ───────
+function viewDoc(downloadUrl, name) {
+  if (!downloadUrl) return;
+  const ext = (name || '').split('.').pop().toLowerCase();
+  if (ext === 'pdf') {
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><body style="margin:0">
+      <iframe src="${downloadUrl}" style="width:100%;height:100vh;border:none;"></iframe>
+    </body></html>`);
+  } else if (['png','jpg','jpeg','gif','webp'].includes(ext)) {
+    window.open(downloadUrl, '_blank');
+  } else {
+    // Descarga directa para otros tipos
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.target = '_blank';
+    a.download = name || 'documento';
+    a.click();
+  }
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position: 'fixed', bottom: '28px', right: '28px', zIndex: '9999',
+    background: 'rgba(0,30,60,0.97)', border: '1px solid rgba(0,229,255,0.3)',
+    color: '#00EEFF', padding: '14px 22px', borderRadius: '10px',
+    fontFamily: "'Exo 2',sans-serif", fontSize: '0.88rem',
+    boxShadow: '0 4px 24px rgba(0,170,255,0.25)', opacity: '1',
+    transition: 'opacity 0.4s'
+  });
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
+}
+
+function updateFileName() {
+  const input = document.getElementById('fileInput');
+  const label = document.getElementById('fileLabel');
+  if (!input || !label) return;
+  label.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PÁGINA PÚBLICA — documentos.html
+// ═══════════════════════════════════════════════════════════
+let currentView = 'root';
+let currentSubFolderId = null;
+
+function goRoot() { currentView = 'root'; currentSubFolderId = null; renderPublic(); }
+function goMain() { currentView = 'main'; currentSubFolderId = null; renderPublic(); }
+function openSubFolder(id) { currentView = 'sub'; currentSubFolderId = id; renderPublic(); }
+
+function renderPublic() {
+  const rootView = document.getElementById('rootView');
+  const mainView = document.getElementById('mainView');
+  const subView  = document.getElementById('subView');
+  if (!rootView) return;
+
+  rootView.style.display = 'none';
+  mainView.style.display = 'none';
+  subView.style.display  = 'none';
+
+  updateBreadcrumb();
+  updateRootCount();
+
+  if (currentView === 'root')       rootView.style.display = '';
+  else if (currentView === 'main') { mainView.style.display = ''; renderSubfolders(); renderRootDocs(); }
+  else if (currentView === 'sub')  { subView.style.display  = ''; renderSubDocs(); }
+}
+
+function updateRootCount() {
+  const el = document.getElementById('rootCount');
+  if (!el) return;
+  const data = getData();
+  const total = data.folders.length + data.documents.filter(d => !d.folderId).length;
+  el.textContent = total + ' elemento' + (total !== 1 ? 's' : '');
+}
+
+function updateBreadcrumb() {
+  const bcMain   = document.getElementById('bc-main');
+  const bcFolder = document.getElementById('bc-folder');
+  const bcSep    = document.getElementById('bc-folder-sep');
+  const data     = getData();
+
+  if (currentView === 'root') {
+    if (bcMain)   bcMain.classList.remove('bc-current');
+    if (bcFolder) bcFolder.style.display = 'none';
+    if (bcSep)    bcSep.style.display = 'none';
+  } else if (currentView === 'main') {
+    if (bcMain)   bcMain.classList.add('bc-current');
+    if (bcFolder) bcFolder.style.display = 'none';
+    if (bcSep)    bcSep.style.display = 'none';
+  } else if (currentView === 'sub') {
+    const folder = data.folders.find(f => f.id === currentSubFolderId);
+    if (bcMain)   bcMain.classList.remove('bc-current');
+    if (bcFolder) { bcFolder.style.display = ''; bcFolder.textContent = folder?.name || ''; }
+    if (bcSep)    bcSep.style.display = '';
+  }
+}
+
+function renderSubfolders() {
+  const container = document.getElementById('subfoldersRows');
+  const mainEmpty = document.getElementById('mainEmpty');
+  if (!container) return;
+  const data = getData();
+  container.innerHTML = '';
+
+  data.folders.forEach(f => {
+    const count = data.documents.filter(d => d.folderId === f.id).length;
+    const row = document.createElement('div');
+    row.className = 'sp-row';
+    row.onclick = () => openSubFolder(f.id);
+    row.innerHTML = `
+      <div class="sp-col-name">
+        <div class="sp-folder-icon" style="color:${folderColorHex(f.color)}">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M3 7c0-1.1.9-2 2-2h4.17l2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="sp-item-name">${escHtml(f.name)}</span>
+      </div>
+      <div class="sp-col-modified sp-meta">${formatDate(f.ts)}</div>
+      <div class="sp-col-by sp-meta">UniBarTech S.A.S</div>
+      <div class="sp-col-size sp-meta">${count} elemento${count !== 1 ? 's' : ''}</div>
+    `;
+    container.appendChild(row);
+  });
+
+  const rootDocs = data.documents.filter(d => !d.folderId);
+  if (data.folders.length === 0 && rootDocs.length === 0) {
+    if (mainEmpty) mainEmpty.style.display = '';
+  } else {
+    if (mainEmpty) mainEmpty.style.display = 'none';
+  }
+}
+
+function renderRootDocs() {
+  const container = document.getElementById('rootDocsRows');
+  if (!container) return;
+  const data = getData();
+  container.innerHTML = '';
+  data.documents.filter(d => !d.folderId).forEach(doc => renderDocRow(doc, container));
+}
+
+function renderSubDocs() {
+  const container = document.getElementById('subDocsRows');
+  const empty     = document.getElementById('subEmpty');
+  if (!container) return;
+  const data = getData();
+  container.innerHTML = '';
+  const docs = data.documents.filter(d => d.folderId === currentSubFolderId);
+  if (docs.length === 0) { if (empty) empty.style.display = ''; return; }
+  if (empty) empty.style.display = 'none';
+  docs.forEach(doc => renderDocRow(doc, container));
+}
+
+function renderDocRow(doc, container) {
+  const fi  = fileIcon(doc.name);
+  const row = document.createElement('div');
+  row.className = 'sp-row sp-doc-row';
+  row.innerHTML = `
+    <div class="sp-col-name">
+      <div class="sp-file-icon">${fi.icon}</div>
+      <span class="sp-item-name">${escHtml(doc.name)}</span>
+    </div>
+    <div class="sp-col-modified sp-meta">${formatDate(doc.ts)}</div>
+    <div class="sp-col-by sp-meta">${escHtml(doc.author || 'UniBarTech S.A.S')}</div>
+    <div class="sp-col-size sp-meta">
+      ${doc.size || '—'}
+      ${doc.downloadUrl ? `
+        <button class="sp-doc-btn" onclick="event.stopPropagation();viewDoc('${doc.downloadUrl}','${escHtml(doc.name)}')">Ver</button>
+        <a href="${doc.downloadUrl}" target="_blank" download="${escHtml(doc.name)}">
+          <button class="sp-doc-btn">⬇</button>
+        </a>
+      ` : ''}
+    </div>
+  `;
+  container.appendChild(row);
+}
+
+function searchDocs() {
+  const q = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+  document.querySelectorAll('.sp-row').forEach(row => {
+    const name = row.querySelector('.sp-item-name')?.textContent.toLowerCase() || '';
+    row.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+}
+
+// ── INIT ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  // Esperar a que Firebase esté listo
+  initFirebaseListeners();
+
+  // Sembrar carpetas por defecto si la BD está vacía (solo se ejecuta una vez)
+  const snap = await firebase.database().ref('unibartech/folders').once('value');
+  if (!snap.exists()) {
+    const seedFolders = {
+      [genId()]: { name: 'INICIO',             color: 'red',    ts: Date.now() },
+      [genId()]: { name: 'PLANEACION',          color: 'blue',   ts: Date.now() },
+      [genId()]: { name: 'EJECUCION',           color: 'green',  ts: Date.now() },
+      [genId()]: { name: 'MONITOREO Y CONTROL', color: 'orange', ts: Date.now() },
+      [genId()]: { name: 'CIERRE',              color: 'teal',   ts: Date.now() },
+    };
+    await firebase.database().ref('unibartech/folders').set(seedFolders);
+  }
+});

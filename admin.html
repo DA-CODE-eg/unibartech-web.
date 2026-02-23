@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — UniBarTech S.A.S</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="docs.css"/>
+  <style>
+    body { background: #020D1F; }
+
+    .admin-login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .admin-login-card {
+      background: rgba(5,20,40,0.98);
+      border: 1px solid rgba(0,170,255,0.25);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,100,255,0.15);
+    }
+    .admin-login-card img { height: 70px; margin-bottom: 20px; }
+    .admin-login-card h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .admin-login-card p { color: var(--gray); font-size: 0.82rem; margin-bottom: 28px; }
+    .admin-login-card input {
+      width: 100%;
+      background: rgba(2,13,31,0.9);
+      border: 1px solid rgba(0,170,255,0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      letter-spacing: 4px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 14px;
+      transition: var(--trans);
+    }
+    .admin-login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
+    .login-error { color: #ff6b6b; font-size: 0.8rem; min-height: 20px; margin-top: 8px; }
+
+    .admin-dash { display: none; padding-top: 80px; }
+    .admin-top-bar {
+      background: rgba(5,20,40,0.95);
+      border-bottom: 1px solid rgba(0,170,255,0.15);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 68px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .admin-top-bar h3 { font-family: var(--font-head); font-size: 0.82rem; color: var(--accent); letter-spacing: 2px; }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 28px;
+      padding: 32px 0 80px;
+    }
+
+    .admin-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+    .admin-card {
+      background: rgba(5,20,40,0.8);
+      border: 1px solid rgba(0,170,255,0.15);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .admin-card h4 {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,170,255,0.1);
+    }
+    .admin-card input,
+    .admin-card select,
+    .admin-card textarea {
+      width: 100%;
+      background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      outline: none;
+      margin-bottom: 10px;
+      transition: var(--trans);
+      resize: vertical;
+    }
+    .admin-card input:focus,
+    .admin-card select:focus { border-color: var(--accent); }
+    .admin-card select option { background: #051428; }
+
+    .color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .color-opt {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--trans);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+    .color-opt:hover, .color-opt.selected { border-color: var(--accent); transform: scale(1.1); }
+    .color-opt.c-blue   { background: #0078D4; }
+    .color-opt.c-green  { background: #107C10; }
+    .color-opt.c-red    { background: #D13438; }
+    .color-opt.c-orange { background: #CA5010; }
+    .color-opt.c-purple { background: #5C2D91; }
+    .color-opt.c-teal   { background: #008272; }
+    .color-opt.c-gold   { background: #986F0B; }
+
+    .file-drop {
+      border: 2px dashed rgba(0,170,255,0.25);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gray);
+      font-size: 0.82rem;
+      transition: var(--trans);
+      margin-bottom: 10px;
+    }
+    .file-drop:hover, .file-drop.dragover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.04); }
+    .file-drop input { display: none; }
+    .file-drop-name { color: var(--accent); font-size: 0.8rem; margin-top: 6px; word-break: break-all; }
+
+    /* Barra de progreso de subida */
+    .upload-progress-wrap {
+      display: none;
+      background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+    .upload-progress-label {
+      font-size: 0.75rem;
+      color: var(--gray);
+      font-family: var(--font-head);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .upload-progress-bar-bg {
+      background: rgba(0,229,255,0.1);
+      border-radius: 100px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .upload-progress-bar {
+      background: linear-gradient(90deg, #0055cc, #00EEFF);
+      height: 100%;
+      border-radius: 100px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .upload-progress-pct {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .content-panel { }
+    .content-panel h4 {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,170,255,0.1);
+    }
+
+    .admin-sp-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(5,20,40,0.6);
+      border: 1px solid rgba(0,170,255,0.08);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: var(--trans);
+      cursor: pointer;
+    }
+    .admin-sp-row:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,85,204,0.1); }
+    .admin-sp-row-name { flex: 1; font-family: var(--font-head); font-size: 0.8rem; color: var(--white); }
+    .admin-sp-row-sub { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
+    .admin-del-btn {
+      background: none;
+      border: none;
+      color: rgba(255,100,100,0.4);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: var(--trans);
+    }
+    .admin-del-btn:hover { color: #ff6b6b; background: rgba(255,100,100,0.1); }
+    .admin-back-btn {
+      background: rgba(0,85,204,0.2);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      color: var(--blue-glow);
+      padding: 6px 14px;
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin-bottom: 14px;
+      display: none;
+      transition: var(--trans);
+    }
+    .admin-back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 800px) {
+      .admin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="admin-login-screen" id="loginScreen">
+  <div class="admin-login-card">
+    <img src="logo.png" alt="UniBarTech"/>
+    <h2>Panel Administrador</h2>
+    <p>UniBarTech S.A.S — Acceso restringido</p>
+    <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') checkAdmin()"/>
+    <button class="btn-primary" style="width:100%" onclick="checkAdmin()">Ingresar →</button>
+    <p class="login-error" id="loginError"></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="admin-dash" id="adminDash">
+
+  <nav id="navbar" style="display:block">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="UniBarTech Logo"/>
+        <span>UniBar<em>Tech</em> — <em style="color:#ff9f43">Admin</em></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="documentos.html">Ver documentos públicos</a></li>
+        <li><a href="index.html">Sitio web</a></li>
+      </ul>
+      <button class="btn-ghost btn-sm" onclick="logoutAdmin()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main class="main-content" style="padding-top:20px">
+    <div class="container">
+
+      <div class="admin-top-bar">
+        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S</h3>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="adminBreadcrumb" style="font-size:0.75rem;color:var(--gray);font-family:var(--font-head)">UniBarTech S.A.S</span>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+
+        <!-- SIDEBAR -->
+        <div class="admin-sidebar">
+
+          <!-- Nueva carpeta -->
+          <div class="admin-card">
+            <h4>📁 NUEVA CARPETA</h4>
+            <input type="text" id="newFolderName" placeholder="Nombre de la carpeta..."/>
+            <div style="font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-family:var(--font-head);letter-spacing:1px;">COLOR</div>
+            <div class="color-picker" id="colorPicker">
+              <div class="color-opt c-blue selected"   data-color="blue"   onclick="selectColor(this)" title="Azul"></div>
+              <div class="color-opt c-green"  data-color="green"  onclick="selectColor(this)" title="Verde"></div>
+              <div class="color-opt c-red"    data-color="red"    onclick="selectColor(this)" title="Rojo"></div>
+              <div class="color-opt c-orange" data-color="orange" onclick="selectColor(this)" title="Naranja"></div>
+              <div class="color-opt c-purple" data-color="purple" onclick="selectColor(this)" title="Morado"></div>
+              <div class="color-opt c-teal"   data-color="teal"   onclick="selectColor(this)" title="Verde azulado"></div>
+              <div class="color-opt c-gold"   data-color="gold"   onclick="selectColor(this)" title="Dorado"></div>
+            </div>
+            <button class="btn-primary" style="width:100%" onclick="adminCreateFolder()">Crear Carpeta</button>
+          </div>
+
+          <!-- Subir documento -->
+          <div class="admin-card">
+            <h4>📄 SUBIR DOCUMENTO</h4>
+            <select id="targetFolder">
+              <option value="">— Selecciona carpeta —</option>
+            </select>
+            <input type="text" id="docName"   placeholder="Nombre del documento (opcional)..."/>
+            <input type="text" id="docDesc"   placeholder="Descripción..."/>
+            <input type="text" id="docAuthor" placeholder="Subido por (tu nombre)..."/>
+            <label class="file-drop" id="fileDrop"
+                   ondragover="dragOver(event)" ondrop="dropFile(event)"
+                   onclick="document.getElementById('fileInput').click()">
+              <div>📎 Arrastra aquí o haz clic para seleccionar</div>
+              <div style="font-size:0.72rem;opacity:0.6;margin-top:4px">PDF, Word, Excel, PPT — máx. 50MB</div>
+              <input type="file" id="fileInput"
+                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                     onchange="updateFileName()"/>
+              <div class="file-drop-name" id="fileLabel"></div>
+            </label>
+
+            <!-- Progreso de subida -->
+            <div class="upload-progress-wrap" id="uploadProgressWrap">
+              <div class="upload-progress-label">SUBIENDO A FIREBASE STORAGE...</div>
+              <div class="upload-progress-bar-bg">
+                <div class="upload-progress-bar" id="uploadProgressBar"></div>
+              </div>
+              <div class="upload-progress-pct" id="uploadProgressPct">0%</div>
+            </div>
+
+            <button class="btn-primary" style="width:100%" id="uploadBtn" onclick="adminUploadDoc()">
+              Subir Documento ↑
+            </button>
+          </div>
+
+        </div>
+
+        <!-- CONTENT PANEL -->
+        <div class="content-panel admin-card">
+          <h4>🗂️ CONTENIDO — UniBarTech S.A.S</h4>
+          <button class="admin-back-btn" id="adminBackBtn" onclick="adminGoBack()">← Volver a UniBarTech S.A.S</button>
+          <div id="adminContentRows"></div>
+          <div class="empty-state" id="adminEmpty" style="display:none;border:none;padding:20px 0">
+            <p style="font-size:0.85rem">No hay contenido aún. Crea una carpeta o sube un documento.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="main.js"></script>
+<script src="docs.js"></script>
+
+<script>
+// ════════════════════════════════════════════
+//  LÓGICA EXCLUSIVA DEL PANEL DE ADMIN
+// ════════════════════════════════════════════
+
+let selectedColor     = 'blue';
+let adminCurrentFolder = null; // null = raíz
+
+// ── Login / Logout ──────────────────────────
+function checkAdmin() {
+  const input = document.getElementById('adminPass');
+  const error = document.getElementById('loginError');
+  if (input.value === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    isAdmin = true;
+    updateFolderSelect();
+  } else {
+    error.textContent = '❌ Contraseña incorrecta';
+    input.value = '';
+    input.focus();
+    setTimeout(() => error.textContent = '', 3000);
+  }
+}
+
+function logoutAdmin() {
+  if (confirm('¿Cerrar sesión de administrador?')) {
+    document.getElementById('adminDash').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPass').value = '';
+    isAdmin = false;
+  }
+}
+
+// ── Color selector ──────────────────────────
+function selectColor(el) {
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+
+// ── Render panel admin ──────────────────────
+function adminRenderContent() {
+  const data     = getData();
+  const rows     = document.getElementById('adminContentRows');
+  const empty    = document.getElementById('adminEmpty');
+  const backBtn  = document.getElementById('adminBackBtn');
+  const breadcrumb = document.getElementById('adminBreadcrumb');
+  if (!rows) return;
+  rows.innerHTML = '';
+
+  if (adminCurrentFolder === null) {
+    backBtn.style.display   = 'none';
+    breadcrumb.textContent  = 'UniBarTech S.A.S';
+
+    const rootDocs = data.documents.filter(d => !d.folderId);
+    if (data.folders.length === 0 && rootDocs.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.folders.forEach(f => {
+      const count = data.documents.filter(d => d.folderId === f.id).length;
+      const row   = document.createElement('div');
+      row.className = 'admin-sp-row';
+      row.innerHTML = `
+        <div style="color:${folderColorHex(f.color)};font-size:1.4rem;width:28px;height:28px">${folderSVG(f.color)}</div>
+        <div style="flex:1">
+          <div class="admin-sp-row-name">${escHtml(f.name)}</div>
+          <div class="admin-sp-row-sub">${count} documento${count !== 1 ? 's' : ''}</div>
+        </div>
+        <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>
+      `;
+      row.addEventListener('click', e => {
+        if (e.target.closest('.admin-del-btn')) return;
+        adminCurrentFolder = f.id;
+        adminRenderContent();
+        updateFolderSelect();
+      });
+      rows.appendChild(row);
+    });
+
+    rootDocs.forEach(doc => renderAdminDocRow(doc, rows));
+
+  } else {
+    const folder = data.folders.find(f => f.id === adminCurrentFolder);
+    backBtn.style.display  = 'block';
+    breadcrumb.textContent = 'UniBarTech S.A.S › ' + (folder?.name || '');
+
+    const docs = data.documents.filter(d => d.folderId === adminCurrentFolder);
+    if (docs.length === 0) { empty.style.display = ''; }
+    else {
+      empty.style.display = 'none';
+      docs.forEach(doc => renderAdminDocRow(doc, rows));
+    }
+  }
+}
+
+function renderAdminDocRow(doc, container) {
+  const row = document.createElement('div');
+  row.className = 'admin-sp-row';
+  row.innerHTML = `
+    <div style="font-size:1.4rem">${fileIconSVG(doc.name)}</div>
+    <div style="flex:1">
+      <div class="admin-sp-row-name">${escHtml(doc.name)}</div>
+      <div class="admin-sp-row-sub">
+        ${doc.desc ? escHtml(doc.desc) + ' · ' : ''}
+        ${doc.size || ''}
+        ${doc.author ? ' · Por: ' + escHtml(doc.author) : ''}
+        · ${formatDate(doc.ts)}
+      </div>
+    </div>
+    ${doc.downloadUrl
+      ? `<button class="doc-btn btn-sm" onclick="event.stopPropagation();viewDoc('${doc.downloadUrl}','${escHtml(doc.name)}')" style="font-size:0.7rem;padding:5px 10px">Ver</button>`
+      : ''}
+    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}')" title="Eliminar">🗑️</button>
+  `;
+  container.appendChild(row);
+}
+
+function adminGoBack() {
+  adminCurrentFolder = null;
+  adminRenderContent();
+  updateFolderSelect();
+}
+
+// ── Crear carpeta ───────────────────────────
+async function adminCreateFolder() {
+  const nameEl = document.getElementById('newFolderName');
+  const name   = nameEl?.value.trim();
+  if (!name) { alert('Escribe el nombre de la carpeta.'); return; }
+
+  const id  = genId();
+  const ref = firebase.database().ref('unibartech/folders/' + id);
+  await ref.set({ name, color: selectedColor, ts: Date.now() });
+
+  nameEl.value = '';
+  showToast('✅ Carpeta "' + name + '" creada.');
+}
+
+// ── Subir documento (base64 en Realtime Database) ─────────
+async function adminUploadDoc() {
+  const nameEl    = document.getElementById('docName');
+  const descEl    = document.getElementById('docDesc');
+  const authorEl  = document.getElementById('docAuthor');
+  const folderEl  = document.getElementById('targetFolder');
+  const fileEl    = document.getElementById('fileInput');
+  const fileLabel = document.getElementById('fileLabel');
+  const btn       = document.getElementById('uploadBtn');
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  const progressBar  = document.getElementById('uploadProgressBar');
+  const progressPct  = document.getElementById('uploadProgressPct');
+
+  const file = fileEl?.files[0] || null;
+  if (!file) { alert('Selecciona un archivo para subir.'); return; }
+  if (file.size > 5 * 1048576) {
+    alert('❌ Archivo muy grande. Máximo 5 MB.\n\nTu archivo pesa: ' + (file.size/1048576).toFixed(1) + ' MB');
+    return;
+  }
+
+  const finalName = nameEl?.value.trim() || file.name;
+  const desc      = descEl?.value.trim()  || '';
+  const author    = authorEl?.value.trim()|| 'Administrador';
+  const folderId  = folderEl?.value       || adminCurrentFolder || null;
+
+  btn.disabled = true;
+  btn.textContent = 'Subiendo...';
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '30%';
+  progressPct.textContent = 'Leyendo archivo...';
+
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = e => resolve(e.target.result);
+      reader.onerror = () => reject(new Error('Error leyendo archivo'));
+      reader.readAsDataURL(file);
+    });
+
+    progressBar.style.width = '70%';
+    progressPct.textContent = 'Guardando en Firebase...';
+
+    const docId = genId();
+    await firebase.database().ref('unibartech/documents/' + docId).set({
+      name: finalName, desc, author, folderId,
+      dataUrl,
+      size: (file.size/1048576).toFixed(2) + ' MB',
+      ts:   Date.now()
+    });
+
+    progressBar.style.width = '100%';
+    progressPct.textContent = '100% ✅';
+
+    if (nameEl)    nameEl.value    = '';
+    if (descEl)    descEl.value    = '';
+    if (fileEl)    fileEl.value    = '';
+    if (fileLabel) fileLabel.textContent = '';
+
+    showToast('✅ "' + finalName + '" subido correctamente.');
+
+  } catch(err) {
+    alert('❌ Error al subir: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Subir Documento ↑';
+    setTimeout(() => {
+      progressWrap.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressPct.textContent = '0%';
+    }, 2000);
+  }
+}
+
+// ── Eliminar carpeta ────────────────────────
+async function adminDeleteFolder(id) {
+  if (!confirm('¿Eliminar carpeta y todos sus documentos?')) return;
+  const data = getData();
+  for (const doc of data.documents.filter(d => d.folderId === id)) {
+    await firebase.database().ref('unibartech/documents/' + doc.id).remove();
+  }
+  await firebase.database().ref('unibartech/folders/' + id).remove();
+  adminGoBack();
+  showToast('🗑️ Carpeta eliminada.');
+};
+
+
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — UniBarTech S.A.S</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="docs.css"/>
+  <style>
+    body { background: #020D1F; }
+
+    .admin-login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .admin-login-card {
+      background: rgba(5,20,40,0.98);
+      border: 1px solid rgba(0,170,255,0.25);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0,100,255,0.15);
+    }
+    .admin-login-card img { height: 70px; margin-bottom: 20px; }
+    .admin-login-card h2 {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .admin-login-card p { color: var(--gray); font-size: 0.82rem; margin-bottom: 28px; }
+    .admin-login-card input {
+      width: 100%;
+      background: rgba(2,13,31,0.9);
+      border: 1px solid rgba(0,170,255,0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      letter-spacing: 4px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 14px;
+      transition: var(--trans);
+    }
+    .admin-login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
+    .login-error { color: #ff6b6b; font-size: 0.8rem; min-height: 20px; margin-top: 8px; }
+
+    .admin-dash { display: none; padding-top: 80px; }
+    .admin-top-bar {
+      background: rgba(5,20,40,0.95);
+      border-bottom: 1px solid rgba(0,170,255,0.15);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 68px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .admin-top-bar h3 { font-family: var(--font-head); font-size: 0.82rem; color: var(--accent); letter-spacing: 2px; }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 28px;
+      padding: 32px 0 80px;
+    }
+
+    .admin-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+    .admin-card {
+      background: rgba(5,20,40,0.8);
+      border: 1px solid rgba(0,170,255,0.15);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .admin-card h4 {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,170,255,0.1);
+    }
+    .admin-card input,
+    .admin-card select,
+    .admin-card textarea {
+      width: 100%;
+      background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      outline: none;
+      margin-bottom: 10px;
+      transition: var(--trans);
+      resize: vertical;
+    }
+    .admin-card input:focus,
+    .admin-card select:focus { border-color: var(--accent); }
+    .admin-card select option { background: #051428; }
+
+    .color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .color-opt {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--trans);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+    .color-opt:hover, .color-opt.selected { border-color: var(--accent); transform: scale(1.1); }
+    .color-opt.c-blue   { background: #0078D4; }
+    .color-opt.c-green  { background: #107C10; }
+    .color-opt.c-red    { background: #D13438; }
+    .color-opt.c-orange { background: #CA5010; }
+    .color-opt.c-purple { background: #5C2D91; }
+    .color-opt.c-teal   { background: #008272; }
+    .color-opt.c-gold   { background: #986F0B; }
+
+    .file-drop {
+      border: 2px dashed rgba(0,170,255,0.25);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gray);
+      font-size: 0.82rem;
+      transition: var(--trans);
+      margin-bottom: 10px;
+    }
+    .file-drop:hover, .file-drop.dragover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.04); }
+    .file-drop input { display: none; }
+    .file-drop-name { color: var(--accent); font-size: 0.8rem; margin-top: 6px; word-break: break-all; }
+
+    /* Barra de progreso de subida */
+    .upload-progress-wrap {
+      display: none;
+      background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+    .upload-progress-label {
+      font-size: 0.75rem;
+      color: var(--gray);
+      font-family: var(--font-head);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .upload-progress-bar-bg {
+      background: rgba(0,229,255,0.1);
+      border-radius: 100px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .upload-progress-bar {
+      background: linear-gradient(90deg, #0055cc, #00EEFF);
+      height: 100%;
+      border-radius: 100px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .upload-progress-pct {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .content-panel { }
+    .content-panel h4 {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,170,255,0.1);
+    }
+
+    .admin-sp-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(5,20,40,0.6);
+      border: 1px solid rgba(0,170,255,0.08);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: var(--trans);
+      cursor: pointer;
+    }
+    .admin-sp-row:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,85,204,0.1); }
+    .admin-sp-row-name { flex: 1; font-family: var(--font-head); font-size: 0.8rem; color: var(--white); }
+    .admin-sp-row-sub { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
+    .admin-del-btn {
+      background: none;
+      border: none;
+      color: rgba(255,100,100,0.4);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: var(--trans);
+    }
+    .admin-del-btn:hover { color: #ff6b6b; background: rgba(255,100,100,0.1); }
+    .admin-back-btn {
+      background: rgba(0,85,204,0.2);
+      border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px;
+      color: var(--blue-glow);
+      padding: 6px 14px;
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin-bottom: 14px;
+      display: none;
+      transition: var(--trans);
+    }
+    .admin-back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 800px) {
+      .admin-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="admin-login-screen" id="loginScreen">
+  <div class="admin-login-card">
+    <img src="logo.png" alt="UniBarTech"/>
+    <h2>Panel Administrador</h2>
+    <p>UniBarTech S.A.S — Acceso restringido</p>
+    <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter') checkAdmin()"/>
+    <button class="btn-primary" style="width:100%" onclick="checkAdmin()">Ingresar →</button>
+    <p class="login-error" id="loginError"></p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="admin-dash" id="adminDash">
+
+  <nav id="navbar" style="display:block">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="UniBarTech Logo"/>
+        <span>UniBar<em>Tech</em> — <em style="color:#ff9f43">Admin</em></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="documentos.html">Ver documentos públicos</a></li>
+        <li><a href="index.html">Sitio web</a></li>
+      </ul>
+      <button class="btn-ghost btn-sm" onclick="logoutAdmin()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <main class="main-content" style="padding-top:20px">
+    <div class="container">
+
+      <div class="admin-top-bar">
+        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S</h3>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="adminBreadcrumb" style="font-size:0.75rem;color:var(--gray);font-family:var(--font-head)">UniBarTech S.A.S</span>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+
+        <!-- SIDEBAR -->
+        <div class="admin-sidebar">
+
+          <!-- Nueva carpeta -->
+          <div class="admin-card">
+            <h4>📁 NUEVA CARPETA</h4>
+            <input type="text" id="newFolderName" placeholder="Nombre de la carpeta..."/>
+            <div style="font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-family:var(--font-head);letter-spacing:1px;">COLOR</div>
+            <div class="color-picker" id="colorPicker">
+              <div class="color-opt c-blue selected"   data-color="blue"   onclick="selectColor(this)" title="Azul"></div>
+              <div class="color-opt c-green"  data-color="green"  onclick="selectColor(this)" title="Verde"></div>
+              <div class="color-opt c-red"    data-color="red"    onclick="selectColor(this)" title="Rojo"></div>
+              <div class="color-opt c-orange" data-color="orange" onclick="selectColor(this)" title="Naranja"></div>
+              <div class="color-opt c-purple" data-color="purple" onclick="selectColor(this)" title="Morado"></div>
+              <div class="color-opt c-teal"   data-color="teal"   onclick="selectColor(this)" title="Verde azulado"></div>
+              <div class="color-opt c-gold"   data-color="gold"   onclick="selectColor(this)" title="Dorado"></div>
+            </div>
+            <button class="btn-primary" style="width:100%" onclick="adminCreateFolder()">Crear Carpeta</button>
+          </div>
+
+          <!-- Subir documento -->
+          <div class="admin-card">
+            <h4>📄 SUBIR DOCUMENTO</h4>
+            <select id="targetFolder">
+              <option value="">— Selecciona carpeta —</option>
+            </select>
+            <input type="text" id="docName"   placeholder="Nombre del documento (opcional)..."/>
+            <input type="text" id="docDesc"   placeholder="Descripción..."/>
+            <input type="text" id="docAuthor" placeholder="Subido por (tu nombre)..."/>
+            <label class="file-drop" id="fileDrop"
+                   ondragover="dragOver(event)" ondrop="dropFile(event)"
+                   onclick="document.getElementById('fileInput').click()">
+              <div>📎 Arrastra aquí o haz clic para seleccionar</div>
+              <div style="font-size:0.72rem;opacity:0.6;margin-top:4px">PDF, Word, Excel, PPT — máx. 50MB</div>
+              <input type="file" id="fileInput"
+                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg"
+                     onchange="updateFileName()"/>
+              <div class="file-drop-name" id="fileLabel"></div>
+            </label>
+
+            <!-- Progreso de subida -->
+            <div class="upload-progress-wrap" id="uploadProgressWrap">
+              <div class="upload-progress-label">SUBIENDO A FIREBASE STORAGE...</div>
+              <div class="upload-progress-bar-bg">
+                <div class="upload-progress-bar" id="uploadProgressBar"></div>
+              </div>
+              <div class="upload-progress-pct" id="uploadProgressPct">0%</div>
+            </div>
+
+            <button class="btn-primary" style="width:100%" id="uploadBtn" onclick="adminUploadDoc()">
+              Subir Documento ↑
+            </button>
+          </div>
+
+        </div>
+
+        <!-- CONTENT PANEL -->
+        <div class="content-panel admin-card">
+          <h4>🗂️ CONTENIDO — UniBarTech S.A.S</h4>
+          <button class="admin-back-btn" id="adminBackBtn" onclick="adminGoBack()">← Volver a UniBarTech S.A.S</button>
+          <div id="adminContentRows"></div>
+          <div class="empty-state" id="adminEmpty" style="display:none;border:none;padding:20px 0">
+            <p style="font-size:0.85rem">No hay contenido aún. Crea una carpeta o sube un documento.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="main.js"></script>
+<script src="docs.js"></script>
+
+<script>
+// ════════════════════════════════════════════
+//  LÓGICA EXCLUSIVA DEL PANEL DE ADMIN
+// ════════════════════════════════════════════
+
+let selectedColor     = 'blue';
+let adminCurrentFolder = null; // null = raíz
+
+// ── Login / Logout ──────────────────────────
+function checkAdmin() {
+  const input = document.getElementById('adminPass');
+  const error = document.getElementById('loginError');
+  if (input.value === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display = 'block';
+    isAdmin = true;
+    updateFolderSelect();
+  } else {
+    error.textContent = '❌ Contraseña incorrecta';
+    input.value = '';
+    input.focus();
+    setTimeout(() => error.textContent = '', 3000);
+  }
+}
+
+function logoutAdmin() {
+  if (confirm('¿Cerrar sesión de administrador?')) {
+    document.getElementById('adminDash').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPass').value = '';
+    isAdmin = false;
+  }
+}
+
+// ── Color selector ──────────────────────────
+function selectColor(el) {
+  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.color;
+}
+
+// ── Render panel admin ──────────────────────
+function adminRenderContent() {
+  const data     = getData();
+  const rows     = document.getElementById('adminContentRows');
+  const empty    = document.getElementById('adminEmpty');
+  const backBtn  = document.getElementById('adminBackBtn');
+  const breadcrumb = document.getElementById('adminBreadcrumb');
+  if (!rows) return;
+  rows.innerHTML = '';
+
+  if (adminCurrentFolder === null) {
+    backBtn.style.display   = 'none';
+    breadcrumb.textContent  = 'UniBarTech S.A.S';
+
+    const rootDocs = data.documents.filter(d => !d.folderId);
+    if (data.folders.length === 0 && rootDocs.length === 0) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.folders.forEach(f => {
+      const count = data.documents.filter(d => d.folderId === f.id).length;
+      const row   = document.createElement('div');
+      row.className = 'admin-sp-row';
+      row.innerHTML = `
+        <div style="color:${folderColorHex(f.color)};font-size:1.4rem;width:28px;height:28px">${folderSVG(f.color)}</div>
+        <div style="flex:1">
+          <div class="admin-sp-row-name">${escHtml(f.name)}</div>
+          <div class="admin-sp-row-sub">${count} documento${count !== 1 ? 's' : ''}</div>
+        </div>
+        <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>
+      `;
+      row.addEventListener('click', e => {
+        if (e.target.closest('.admin-del-btn')) return;
+        adminCurrentFolder = f.id;
+        adminRenderContent();
+        updateFolderSelect();
+      });
+      rows.appendChild(row);
+    });
+
+    rootDocs.forEach(doc => renderAdminDocRow(doc, rows));
+
+  } else {
+    const folder = data.folders.find(f => f.id === adminCurrentFolder);
+    backBtn.style.display  = 'block';
+    breadcrumb.textContent = 'UniBarTech S.A.S › ' + (folder?.name || '');
+
+    const docs = data.documents.filter(d => d.folderId === adminCurrentFolder);
+    if (docs.length === 0) { empty.style.display = ''; }
+    else {
+      empty.style.display = 'none';
+      docs.forEach(doc => renderAdminDocRow(doc, rows));
+    }
+  }
+}
+
+function renderAdminDocRow(doc, container) {
+  const row = document.createElement('div');
+  row.className = 'admin-sp-row';
+  row.innerHTML = `
+    <div style="font-size:1.4rem">${fileIconSVG(doc.name)}</div>
+    <div style="flex:1">
+      <div class="admin-sp-row-name">${escHtml(doc.name)}</div>
+      <div class="admin-sp-row-sub">
+        ${doc.desc ? escHtml(doc.desc) + ' · ' : ''}
+        ${doc.size || ''}
+        ${doc.author ? ' · Por: ' + escHtml(doc.author) : ''}
+        · ${formatDate(doc.ts)}
+      </div>
+    </div>
+    ${doc.downloadUrl
+      ? `<button class="doc-btn btn-sm" onclick="event.stopPropagation();viewDoc('${doc.downloadUrl}','${escHtml(doc.name)}')" style="font-size:0.7rem;padding:5px 10px">Ver</button>`
+      : ''}
+    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}')" title="Eliminar">🗑️</button>
+  `;
+  container.appendChild(row);
+}
+
+function adminGoBack() {
+  adminCurrentFolder = null;
+  adminRenderContent();
+  updateFolderSelect();
+}
+
+// ── Crear carpeta ───────────────────────────
+async function adminCreateFolder() {
+  const nameEl = document.getElementById('newFolderName');
+  const name   = nameEl?.value.trim();
+  if (!name) { alert('Escribe el nombre de la carpeta.'); return; }
+
+  const id  = genId();
+  const ref = firebase.database().ref('unibartech/folders/' + id);
+  await ref.set({ name, color: selectedColor, ts: Date.now() });
+
+  nameEl.value = '';
+  showToast('✅ Carpeta "' + name + '" creada.');
+}
+
+// ── Subir documento a Firebase Storage ─────
+async function adminUploadDoc() {
+  const nameEl   = document.getElementById('docName');
+  const descEl   = document.getElementById('docDesc');
+  const authorEl = document.getElementById('docAuthor');
+  const folderEl = document.getElementById('targetFolder');
+  const fileEl   = document.getElementById('fileInput');
+  const fileLabel = document.getElementById('fileLabel');
+  const btn       = document.getElementById('uploadBtn');
+  const progressWrap = document.getElementById('uploadProgressWrap');
+  const progressBar  = document.getElementById('uploadProgressBar');
+  const progressPct  = document.getElementById('uploadProgressPct');
+
+  const file = fileEl?.files[0] || null;
+  if (!file) { alert('Selecciona un archivo para subir.'); return; }
+  if (file.size > 50 * 1048576) { alert('Archivo demasiado grande. Máximo 50 MB.'); return; }
+
+  const finalName = nameEl?.value.trim() || file.name;
+  const desc      = descEl?.value.trim()   || '';
+  const author    = authorEl?.value.trim() || 'Administrador';
+  const folderId  = folderEl?.value        || adminCurrentFolder || null;
+
+  // Mostrar progreso
+  btn.disabled = true;
+  btn.textContent = 'Subiendo...';
+  progressWrap.style.display = 'block';
+
+  try {
+
+    // Escuchar progreso
+    await new Promise((resolve, reject) => {
+        snapshot => {
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          progressBar.style.width = pct + '%';
+          progressPct.textContent = pct + '%';
+        },
+        err => reject(err),
+        () => resolve()
+      );
+    });
+
+    // Obtener URL de descarga pública
+    const sizeMB      = (file.size / 1048576).toFixed(2) + ' MB';
+
+    // Guardar metadata en Realtime Database
+    const docId  = genId();
+    const docRef = firebase.database().ref('unibartech/documents/' + docId);
+    await docRef.set({
+      name: finalName, desc, author, folderId,
+      size: sizeMB, ts: Date.now()
+    });
+
+    // Limpiar formulario
+    if (nameEl)   nameEl.value   = '';
+    if (descEl)   descEl.value   = '';
+    if (fileEl)   fileEl.value   = '';
+    if (fileLabel) fileLabel.textContent = '';
+
+    showToast('✅ "' + finalName + '" subido correctamente.');
+
+  } catch (err) {
+    console.error(err);
+    alert('❌ Error al subir el archivo: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Subir Documento ↑';
+    progressWrap.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressPct.textContent  = '0%';
+  }
+}
+
+// ── Eliminar carpeta ────────────────────────
+async function adminDeleteFolder(id) {
+  if (!confirm('¿Eliminar carpeta y todos sus documentos?')) return;
+
+  const data = getData();
+  const docsInFolder = data.documents.filter(d => d.folderId === id);
+
+  // Eliminar archivos en Storage
+  for (const doc of docsInFolder) {
+    }
+    await firebase.database().ref('unibartech/documents/' + doc.id).remove();
+  }
+  await firebase.database().ref('unibartech/folders/' + id).remove();
+
+  adminGoBack();
+  showToast('🗑️ Carpeta eliminada.');
+}
+
+// ── Eliminar documento ──────────────────────
+  if (!confirm('¿Eliminar este documento?')) return;
+
+  }
+  await firebase.database().ref('unibartech/documents/' + id).remove();
+  showToast('🗑️ Documento eliminado.');
+}
+
+// ── Actualizar selector de carpetas ────────
+function updateFolderSelect() {
+  const sel = document.getElementById('targetFolder');
+  if (!sel) return;
+  const data = getData();
+  sel.innerHTML = '<option value="">— Sin carpeta (raíz) —</option>';
+  data.folders.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.name;
+    if (f.id === adminCurrentFolder) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Drag & drop ─────────────────────────────
+function dragOver(e) {
+  e.preventDefault();
+  document.getElementById('fileDrop').classList.add('dragover');
+}
+function dropFile(e) {
+  e.preventDefault();
+  document.getElementById('fileDrop').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('fileInput').files = dt.files;
+    updateFileName();
+  }
+}
+
+// Actualizar nombre de archivo seleccionado
+function updateFileName() {
+  const input = document.getElementById('fileInput');
+  const label = document.getElementById('fileLabel');
+  if (!input || !label) return;
+  label.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Documentos — UniBarTech S.A.S</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="docs.css"/>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="UniBarTech Logo"/>
+      <span>UniBar<em>Tech</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="quienes-somos.html">Quiénes Somos</a></li>
+      <li><a href="documentos.html" class="active">Documentos</a></li>
+      <li><a href="index.html#contacto">Contacto</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+</nav>
+
+<div class="page-hero page-hero-short">
+  <div class="page-hero-overlay"></div>
+  <img src="hero.jpg" alt="UniBarTech" class="page-hero-img"/>
+  <div class="page-hero-content">
+    <div class="section-tag">Repositorio Corporativo</div>
+    <h1>Documentos <span class="accent">UniBarTech</span></h1>
+    <p>Accede a todos los documentos oficiales de la empresa.</p>
+  </div>
+</div>
+
+<main class="main-content docs-main">
+  <div class="container">
+
+    <div class="docs-toolbar">
+      <div class="docs-search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar carpeta o documento..." oninput="searchDocs()"/>
+      </div>
+    </div>
+
+    <!-- BREADCRUMB -->
+    <div class="sp-breadcrumb" id="breadcrumb">
+      <span class="bc-home bc-link" onclick="goRoot()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Archivos
+      </span>
+      <span class="bc-sep">›</span>
+      <span class="bc-item bc-link" id="bc-main" onclick="goMain()">UniBarTech S.A.S</span>
+      <span class="bc-sep" id="bc-folder-sep" style="display:none">›</span>
+      <span class="bc-item bc-current" id="bc-folder" style="display:none"></span>
+    </div>
+
+    <!-- ROOT VIEW -->
+    <div id="rootView">
+      <div class="sp-table-header">
+        <div class="sp-col-name">Nombre</div>
+        <div class="sp-col-modified">Modificado</div>
+        <div class="sp-col-size">Elementos</div>
+      </div>
+      <div class="sp-row" onclick="goMain()">
+        <div class="sp-col-name">
+          <div class="sp-folder-icon sp-folder-blue">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 7c0-1.1.9-2 2-2h4.17l2 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" fill="currentColor"/></svg>
+          </div>
+          <span class="sp-item-name">UniBarTech S.A.S</span>
+        </div>
+        <div class="sp-col-modified sp-meta">Hoy</div>
+        <div class="sp-col-size sp-meta" id="rootCount">— elementos</div>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW -->
+    <div id="mainView" style="display:none;">
+      <div class="sp-table-header">
+        <div class="sp-col-name">Nombre</div>
+        <div class="sp-col-modified">Modificado</div>
+        <div class="sp-col-by">Modificado por</div>
+        <div class="sp-col-size">Elementos</div>
+      </div>
+      <div id="subfoldersRows"></div>
+      <div id="rootDocsRows"></div>
+      <div class="empty-state" id="mainEmpty" style="display:none;">
+        <p>📂 Esta carpeta está vacía. El administrador puede agregar subcarpetas y documentos.</p>
+      </div>
+    </div>
+
+    <!-- SUB VIEW -->
+    <div id="subView" style="display:none;">
+      <div class="sp-table-header">
+        <div class="sp-col-name">Nombre</div>
+        <div class="sp-col-modified">Modificado</div>
+        <div class="sp-col-by">Subido por</div>
+        <div class="sp-col-size">Tamaño</div>
+      </div>
+      <div id="subDocsRows"></div>
+      <div class="empty-state" id="subEmpty" style="display:none;">
+        <p>📭 No hay documentos en esta carpeta aún.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="logo.png" alt="UniBarTech"/>
+      <span>UniBar<em>Tech</em> S.A.S.</span>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Inicio</a>
+      <a href="quienes-somos.html">Quiénes Somos</a>
+      <a href="documentos.html">Documentos</a>
+      <a href="index.html#contacto">Contacto</a>
+    </div>
+    <p class="footer-copy">© 2025 UniBarTech S.A.S — NIT 901.874.563-2 · Bogotá, Colombia</p>
+  </div>
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<!-- Tu configuración Firebase -->
+<script src="firebase-config.js"></script>
+<!-- Lógica del sistema de documentos -->
+<script src="main.js"></script>
+<script src="docs.js"></script>
+</body>
+</html>
