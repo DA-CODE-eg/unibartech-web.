@@ -14,116 +14,65 @@
 
     .admin-login-screen {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .admin-login-card {
       background: rgba(5,20,40,0.98);
       border: 1px solid rgba(0,170,255,0.25);
-      border-radius: 16px;
-      padding: 48px 40px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 24px 80px rgba(0,100,255,0.15);
+      border-radius: 16px; padding: 48px 40px;
+      width: 100%; max-width: 400px;
+      text-align: center; box-shadow: 0 24px 80px rgba(0,100,255,0.15);
     }
     .admin-login-card img { height: 70px; margin-bottom: 20px; }
     .admin-login-card h2 {
-      font-family: var(--font-head);
-      font-size: 1rem;
-      color: var(--accent);
-      letter-spacing: 2px;
-      margin-bottom: 6px;
+      font-family: var(--font-head); font-size: 1rem;
+      color: var(--accent); letter-spacing: 2px; margin-bottom: 6px;
     }
     .admin-login-card p { color: var(--gray); font-size: 0.82rem; margin-bottom: 28px; }
     .admin-login-card input {
-      width: 100%;
-      background: rgba(2,13,31,0.9);
-      border: 1px solid rgba(0,170,255,0.25);
-      border-radius: 10px;
-      padding: 14px 18px;
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 1rem;
-      letter-spacing: 4px;
-      text-align: center;
-      outline: none;
-      margin-bottom: 14px;
-      transition: var(--trans);
+      width: 100%; background: rgba(2,13,31,0.9);
+      border: 1px solid rgba(0,170,255,0.25); border-radius: 10px;
+      padding: 14px 18px; color: var(--white); font-family: var(--font-body);
+      font-size: 1rem; letter-spacing: 4px; text-align: center;
+      outline: none; margin-bottom: 14px; transition: var(--trans); box-sizing: border-box;
     }
     .admin-login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
     .login-error { color: #ff6b6b; font-size: 0.8rem; min-height: 20px; margin-top: 8px; }
 
-    .admin-dash { display: block; padding-top: 80px; }
+    .admin-dash { display: none; padding-top: 80px; }
     .admin-top-bar {
-      background: rgba(5,20,40,0.95);
-      border-bottom: 1px solid rgba(0,170,255,0.15);
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 68px;
-      z-index: 100;
-      backdrop-filter: blur(10px);
+      background: rgba(5,20,40,0.95); border-bottom: 1px solid rgba(0,170,255,0.15);
+      padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 68px; z-index: 100; backdrop-filter: blur(10px);
     }
     .admin-top-bar h3 { font-family: var(--font-head); font-size: 0.82rem; color: var(--accent); letter-spacing: 2px; }
-
     .admin-grid {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 28px;
-      padding: 32px 0 80px;
+      display: grid; grid-template-columns: 340px 1fr;
+      gap: 28px; padding: 32px 0 80px;
     }
-
     .admin-sidebar { display: flex; flex-direction: column; gap: 20px; }
-
     .admin-card {
-      background: rgba(5,20,40,0.8);
-      border: 1px solid rgba(0,170,255,0.15);
-      border-radius: 14px;
-      padding: 24px;
+      background: rgba(5,20,40,0.8); border: 1px solid rgba(0,170,255,0.15);
+      border-radius: 14px; padding: 24px;
     }
     .admin-card h4 {
-      font-family: var(--font-head);
-      font-size: 0.78rem;
-      color: var(--accent);
-      letter-spacing: 1.5px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
+      font-family: var(--font-head); font-size: 0.78rem; color: var(--accent);
+      letter-spacing: 1.5px; margin-bottom: 16px; padding-bottom: 10px;
       border-bottom: 1px solid rgba(0,170,255,0.1);
     }
-    .admin-card input,
-    .admin-card select,
-    .admin-card textarea {
-      width: 100%;
-      background: rgba(2,13,31,0.8);
-      border: 1px solid rgba(0,170,255,0.2);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 0.85rem;
-      outline: none;
-      margin-bottom: 10px;
-      transition: var(--trans);
-      resize: vertical;
+    .admin-card input, .admin-card select, .admin-card textarea {
+      width: 100%; background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-family: var(--font-body);
+      font-size: 0.85rem; outline: none; margin-bottom: 10px;
+      transition: var(--trans); resize: vertical; box-sizing: border-box;
     }
-    .admin-card input:focus,
-    .admin-card select:focus { border-color: var(--accent); }
+    .admin-card input:focus, .admin-card select:focus { border-color: var(--accent); }
     .admin-card select option { background: #051428; }
-
     .color-picker { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .color-opt {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: var(--trans);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem;
+      width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+      border: 2px solid transparent; transition: var(--trans);
     }
     .color-opt:hover, .color-opt.selected { border-color: var(--accent); transform: scale(1.1); }
     .color-opt.c-blue   { background: #0078D4; }
@@ -133,119 +82,62 @@
     .color-opt.c-purple { background: #5C2D91; }
     .color-opt.c-teal   { background: #008272; }
     .color-opt.c-gold   { background: #986F0B; }
-
     .file-drop {
-      border: 2px dashed rgba(0,170,255,0.25);
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      color: var(--gray);
-      font-size: 0.82rem;
-      transition: var(--trans);
-      margin-bottom: 10px;
+      border: 2px dashed rgba(0,170,255,0.25); border-radius: 10px;
+      padding: 20px; text-align: center; cursor: pointer;
+      color: var(--gray); font-size: 0.82rem; transition: var(--trans); margin-bottom: 10px; display: block;
     }
     .file-drop:hover, .file-drop.dragover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.04); }
-    .file-drop input { display: none; }
+    .file-drop input[type=file] { display: none; }
     .file-drop-name { color: var(--accent); font-size: 0.8rem; margin-top: 6px; word-break: break-all; }
-
-    /* Barra de progreso de subida */
     .upload-progress-wrap {
-      display: none;
-      background: rgba(2,13,31,0.8);
-      border: 1px solid rgba(0,170,255,0.2);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 10px;
+      display: none; background: rgba(2,13,31,0.8);
+      border: 1px solid rgba(0,170,255,0.2); border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 10px;
     }
-    .upload-progress-label {
-      font-size: 0.75rem;
-      color: var(--gray);
-      font-family: var(--font-head);
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .upload-progress-bar-bg {
-      background: rgba(0,229,255,0.1);
-      border-radius: 100px;
-      height: 6px;
-      overflow: hidden;
-    }
-    .upload-progress-bar {
-      background: linear-gradient(90deg, #0055cc, #00EEFF);
-      height: 100%;
-      border-radius: 100px;
-      width: 0%;
-      transition: width 0.2s;
-    }
-    .upload-progress-pct {
-      font-size: 0.7rem;
-      color: var(--accent);
-      margin-top: 4px;
-      text-align: right;
-    }
-
-    .content-panel { }
-    .content-panel h4 {
-      font-family: var(--font-head);
-      font-size: 0.78rem;
-      color: var(--accent);
-      letter-spacing: 1.5px;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(0,170,255,0.1);
-    }
-
+    .upload-progress-label { font-size: 0.75rem; color: var(--gray); font-family: var(--font-head); letter-spacing: 1px; margin-bottom: 8px; }
+    .upload-progress-bar-bg { background: rgba(0,229,255,0.1); border-radius: 100px; height: 6px; overflow: hidden; }
+    .upload-progress-bar { background: linear-gradient(90deg,#0055cc,#00EEFF); height: 100%; border-radius: 100px; width: 0%; transition: width 0.2s; }
+    .upload-progress-pct { font-size: 0.7rem; color: var(--accent); margin-top: 4px; text-align: right; }
     .admin-sp-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgba(5,20,40,0.6);
-      border: 1px solid rgba(0,170,255,0.08);
-      border-radius: 10px;
-      margin-bottom: 8px;
-      transition: var(--trans);
-      cursor: pointer;
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: rgba(5,20,40,0.6); border: 1px solid rgba(0,170,255,0.08);
+      border-radius: 10px; margin-bottom: 8px; transition: var(--trans); cursor: pointer;
     }
     .admin-sp-row:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,85,204,0.1); }
     .admin-sp-row-name { flex: 1; font-family: var(--font-head); font-size: 0.8rem; color: var(--white); }
     .admin-sp-row-sub { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
     .admin-del-btn {
-      background: none;
-      border: none;
-      color: rgba(255,100,100,0.4);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: var(--trans);
+      background: none; border: none; color: rgba(255,100,100,0.4);
+      cursor: pointer; font-size: 1rem; padding: 4px 8px; border-radius: 6px; transition: var(--trans);
     }
     .admin-del-btn:hover { color: #ff6b6b; background: rgba(255,100,100,0.1); }
     .admin-back-btn {
-      background: rgba(0,85,204,0.2);
-      border: 1px solid rgba(0,170,255,0.2);
-      border-radius: 8px;
-      color: var(--blue-glow);
-      padding: 6px 14px;
-      font-family: var(--font-head);
-      font-size: 0.7rem;
-      cursor: pointer;
-      margin-bottom: 14px;
-      display: none;
-      transition: var(--trans);
+      background: rgba(0,85,204,0.2); border: 1px solid rgba(0,170,255,0.2);
+      border-radius: 8px; color: var(--blue-glow); padding: 6px 14px;
+      font-family: var(--font-head); font-size: 0.7rem; cursor: pointer;
+      margin-bottom: 14px; display: none; transition: var(--trans);
     }
     .admin-back-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    @media (max-width: 800px) {
-      .admin-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 800px) { .admin-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<!-- DASHBOARD - ACCESO DIRECTO (SIN LOGIN) -->
-<div class="admin-dash" id="adminDash" style="display:block;">
+<!-- ══ LOGIN ══ -->
+<div class="admin-login-screen" id="loginScreen">
+  <div class="admin-login-card">
+    <img src="logo.png" alt="UniBarTech"/>
+    <h2>PANEL DE ADMINISTRACIÓN</h2>
+    <p>Ingresa la contraseña para acceder</p>
+    <input type="password" id="passInput" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-primary" style="width:100%" onclick="doLogin()">Ingresar →</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="admin-dash" id="adminDash">
 
   <nav id="navbar" style="display:block">
     <div class="nav-inner">
@@ -257,7 +149,7 @@
         <li><a href="documentos.html">Ver documentos públicos</a></li>
         <li><a href="index.html">Sitio web</a></li>
       </ul>
-      <button class="btn-ghost btn-sm" onclick="if(confirm('¿Volver al login?')) location.reload()">Salir</button>
+      <button class="btn-ghost btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </nav>
 
@@ -265,10 +157,8 @@
     <div class="container">
 
       <div class="admin-top-bar">
-        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S (ACCESO DIRECTO)</h3>
-        <div style="display:flex;gap:10px;align-items:center">
-          <span id="adminBreadcrumb" style="font-size:0.75rem;color:var(--gray);font-family:var(--font-head)">UniBarTech S.A.S</span>
-        </div>
+        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S</h3>
+        <span id="adminBreadcrumb" style="font-size:0.75rem;color:var(--gray);font-family:var(--font-head)">UniBarTech S.A.S</span>
       </div>
 
       <div class="admin-grid">
@@ -280,15 +170,15 @@
           <div class="admin-card">
             <h4>📁 NUEVA CARPETA</h4>
             <input type="text" id="newFolderName" placeholder="Nombre de la carpeta..."/>
-            <div style="font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-family:var(--font-head);letter-spacing:1px;">COLOR</div>
+            <div style="font-size:0.72rem;color:var(--gray);margin-bottom:8px;font-family:var(--font-head);letter-spacing:1px">COLOR</div>
             <div class="color-picker" id="colorPicker">
-              <div class="color-opt c-blue selected"   data-color="blue"   onclick="selectColor(this)" title="Azul"></div>
-              <div class="color-opt c-green"  data-color="green"  onclick="selectColor(this)" title="Verde"></div>
-              <div class="color-opt c-red"    data-color="red"    onclick="selectColor(this)" title="Rojo"></div>
-              <div class="color-opt c-orange" data-color="orange" onclick="selectColor(this)" title="Naranja"></div>
-              <div class="color-opt c-purple" data-color="purple" onclick="selectColor(this)" title="Morado"></div>
-              <div class="color-opt c-teal"   data-color="teal"   onclick="selectColor(this)" title="Verde azulado"></div>
-              <div class="color-opt c-gold"   data-color="gold"   onclick="selectColor(this)" title="Dorado"></div>
+              <div class="color-opt c-blue selected"   data-color="blue"   onclick="selectColor(this)"></div>
+              <div class="color-opt c-green"  data-color="green"  onclick="selectColor(this)"></div>
+              <div class="color-opt c-red"    data-color="red"    onclick="selectColor(this)"></div>
+              <div class="color-opt c-orange" data-color="orange" onclick="selectColor(this)"></div>
+              <div class="color-opt c-purple" data-color="purple" onclick="selectColor(this)"></div>
+              <div class="color-opt c-teal"   data-color="teal"   onclick="selectColor(this)"></div>
+              <div class="color-opt c-gold"   data-color="gold"   onclick="selectColor(this)"></div>
             </div>
             <button class="btn-primary" style="width:100%" onclick="adminCreateFolder()">Crear Carpeta</button>
           </div>
@@ -297,7 +187,7 @@
           <div class="admin-card">
             <h4>📄 SUBIR DOCUMENTO</h4>
             <select id="targetFolder">
-              <option value="">— Selecciona carpeta —</option>
+              <option value="">— Sin carpeta (raíz) —</option>
             </select>
             <input type="text" id="docName"   placeholder="Nombre del documento (opcional)..."/>
             <input type="text" id="docDesc"   placeholder="Descripción..."/>
@@ -313,7 +203,6 @@
               <div class="file-drop-name" id="fileLabel"></div>
             </label>
 
-            <!-- Progreso de subida -->
             <div class="upload-progress-wrap" id="uploadProgressWrap">
               <div class="upload-progress-label">SUBIENDO A FIREBASE STORAGE...</div>
               <div class="upload-progress-bar-bg">
@@ -350,328 +239,274 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="main.js"></script>
-<script src="docs.js"></script>
 
 <script>
-// ════════════════════════════════════════════
-//  PANEL DE ADMIN - SIN CONTRASEÑA
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  ADMIN — Lógica autónoma (no depende de docs.js)
+// ════════════════════════════════════════════════════════
 
-let selectedColor = 'blue';
-let adminCurrentFolder = null;
+const ADMIN_PASS = 'Unibar2025!';
+let adminData    = { folders: [], documents: [] };
+let selectedColor        = 'blue';
+let adminCurrentFolder   = null;
 
-// ===== LOGOUT =====
-function logoutAdmin() {
-  if (confirm('¿Cerrar sesión?')) {
-    location.reload();
+// ── Login / Logout ──
+function doLogin() {
+  const val = document.getElementById('passInput').value;
+  if (val === ADMIN_PASS) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminDash').style.display  = 'block';
+    initAdminFirebase();
+  } else {
+    document.getElementById('loginError').textContent = '❌ Contraseña incorrecta';
+    document.getElementById('passInput').value = '';
   }
 }
+function doLogout() {
+  if (confirm('¿Cerrar sesión?')) location.reload();
+}
 
-// ===== COLOR SELECTOR =====
+// ── Firebase listener (solo para admin) ──
+function initAdminFirebase() {
+  firebase.database().ref('unibartech').on('value', snap => {
+    const val  = snap.val() || {};
+    const fObj = val.folders   || {};
+    const dObj = val.documents || {};
+    adminData.folders   = Object.entries(fObj).map(([id,f])=>({id,...f})).sort((a,b)=>(a.ts||0)-(b.ts||0));
+    adminData.documents = Object.entries(dObj).map(([id,d])=>({id,...d})).sort((a,b)=>(a.ts||0)-(b.ts||0));
+    adminRenderContent();
+    updateFolderSelect();
+  });
+}
+
+// ── Utilidades ──
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+}
+function folderColorHex(color) {
+  const m={blue:'#0078D4',green:'#107C10',red:'#D13438',orange:'#CA5010',purple:'#5C2D91',teal:'#008272',gold:'#986F0B'};
+  return m[color]||'#0078D4';
+}
+function showToast(msg) {
+  const t=document.createElement('div');
+  t.textContent=msg;
+  Object.assign(t.style,{position:'fixed',bottom:'28px',right:'28px',zIndex:'9999',
+    background:'rgba(0,30,60,0.97)',border:'1px solid rgba(0,229,255,0.3)',
+    color:'#00EEFF',padding:'14px 22px',borderRadius:'10px',
+    fontFamily:"'Exo 2',sans-serif",fontSize:'0.88rem',opacity:'1',transition:'opacity 0.4s'});
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},3000);
+}
+
+// ── Color selector ──
 function selectColor(el) {
-  document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('selected'));
+  document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('selected'));
   el.classList.add('selected');
   selectedColor = el.dataset.color;
 }
 
-// ===== RENDER CONTENT =====
-function adminRenderContent() {
-  const data = typeof getData === 'function' ? getData() : { folders: [], documents: [] };
-  const rows = document.getElementById('adminContentRows');
-  const empty = document.getElementById('adminEmpty');
-  const backBtn = document.getElementById('adminBackBtn');
-  const breadcrumb = document.getElementById('adminBreadcrumb');
-  
-  if (!rows) return;
-  rows.innerHTML = '';
-
-  if (adminCurrentFolder === null) {
-    backBtn.style.display = 'none';
-    breadcrumb.textContent = 'UniBarTech S.A.S';
-
-    const rootDocs = data.documents ? data.documents.filter(d => !d.folderId) : [];
-    
-    if ((!data.folders || data.folders.length === 0) && rootDocs.length === 0) {
-      empty.style.display = '';
-      return;
-    }
-    empty.style.display = 'none';
-
-    if (data.folders) {
-      data.folders.forEach(f => {
-        const count = data.documents ? data.documents.filter(d => d.folderId === f.id).length : 0;
-        const row = document.createElement('div');
-        row.className = 'admin-sp-row';
-        row.innerHTML = `
-          <div style="color:${folderColorHex(f.color)};font-size:1.4rem;width:28px;height:28px">📁</div>
-          <div style="flex:1">
-            <div class="admin-sp-row-name">${escHtml(f.name)}</div>
-            <div class="admin-sp-row-sub">${count} documento${count !== 1 ? 's' : ''}</div>
-          </div>
-          <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>
-        `;
-        row.addEventListener('click', e => {
-          if (e.target.closest('.admin-del-btn')) return;
-          adminCurrentFolder = f.id;
-          adminRenderContent();
-          updateFolderSelect();
-        });
-        rows.appendChild(row);
-      });
-    }
-
-    rootDocs.forEach(doc => renderAdminDocRow(doc, rows));
-
-  } else {
-    const folder = data.folders ? data.folders.find(f => f.id === adminCurrentFolder) : null;
-    backBtn.style.display = 'block';
-    breadcrumb.textContent = 'UniBarTech S.A.S › ' + (folder?.name || '');
-
-    const docs = data.documents ? data.documents.filter(d => d.folderId === adminCurrentFolder) : [];
-    if (docs.length === 0) { 
-      empty.style.display = ''; 
-    } else {
-      empty.style.display = 'none';
-      docs.forEach(doc => renderAdminDocRow(doc, rows));
-    }
-  }
-}
-
-function renderAdminDocRow(doc, container) {
-  const row = document.createElement('div');
-  row.className = 'admin-sp-row';
-  row.innerHTML = `
-    <div style="font-size:1.4rem">📄</div>
-    <div style="flex:1">
-      <div class="admin-sp-row-name">${escHtml(doc.name)}</div>
-      <div class="admin-sp-row-sub">
-        ${doc.desc ? escHtml(doc.desc) + ' · ' : ''}
-        ${doc.size || ''}
-        ${doc.author ? ' · Por: ' + escHtml(doc.author) : ''}
-        · ${formatDate(doc.ts)}
-      </div>
-    </div>
-    ${doc.downloadUrl
-      ? `<button class="doc-btn btn-sm" onclick="event.stopPropagation();window.open('${doc.downloadUrl}', '_blank')" style="font-size:0.7rem;padding:5px 10px">Ver</button>`
-      : ''}
-    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}')" title="Eliminar">🗑️</button>
-  `;
-  container.appendChild(row);
-}
-
-function adminGoBack() {
-  adminCurrentFolder = null;
-  adminRenderContent();
-  updateFolderSelect();
-}
-
-// ===== CREAR CARPETA =====
+// ── Crear carpeta ──
 async function adminCreateFolder() {
-  if (typeof firebase === 'undefined') {
-    alert('Firebase no está inicializado');
-    return;
-  }
-  
   const nameEl = document.getElementById('newFolderName');
-  const name = nameEl?.value.trim();
+  const name   = nameEl?.value.trim();
   if (!name) { alert('Escribe el nombre de la carpeta.'); return; }
-
   const id = genId();
-  const ref = firebase.database().ref('unibartech/folders/' + id);
-  await ref.set({ name, color: selectedColor, ts: Date.now() });
-
+  await firebase.database().ref('unibartech/folders/'+id).set({ name, color: selectedColor, ts: Date.now() });
   nameEl.value = '';
-  showToast('✅ Carpeta "' + name + '" creada.');
+  showToast('✅ Carpeta "'+name+'" creada.');
 }
 
-// ===== SUBIR DOCUMENTO =====
+// ── Subir documento ──
 async function adminUploadDoc() {
-  const nameEl = document.getElementById('docName');
-  const descEl = document.getElementById('docDesc');
-  const authorEl = document.getElementById('docAuthor');
-  const folderEl = document.getElementById('targetFolder');
-  const fileEl = document.getElementById('fileInput');
-  const fileLabel = document.getElementById('fileLabel');
-  const btn = document.getElementById('uploadBtn');
-  const progressWrap = document.getElementById('uploadProgressWrap');
+  const nameEl      = document.getElementById('docName');
+  const descEl      = document.getElementById('docDesc');
+  const authorEl    = document.getElementById('docAuthor');
+  const folderEl    = document.getElementById('targetFolder');
+  const fileEl      = document.getElementById('fileInput');
+  const fileLabel   = document.getElementById('fileLabel');
+  const btn         = document.getElementById('uploadBtn');
+  const progressWrap= document.getElementById('uploadProgressWrap');
   const progressBar = document.getElementById('uploadProgressBar');
   const progressPct = document.getElementById('uploadProgressPct');
 
   const file = fileEl?.files[0] || null;
   if (!file) { alert('Selecciona un archivo para subir.'); return; }
-  if (file.size > 50 * 1048576) { alert('Archivo demasiado grande. Máximo 50 MB.'); return; }
+  if (file.size > 50*1048576) { alert('Archivo demasiado grande. Máximo 50 MB.'); return; }
 
   const finalName = nameEl?.value.trim() || file.name;
-  const desc = descEl?.value.trim() || '';
-  const author = authorEl?.value.trim() || 'Administrador';
-  const folderId = folderEl?.value || adminCurrentFolder || null;
+  const desc      = descEl?.value.trim()   || '';
+  const author    = authorEl?.value.trim() || 'Administrador';
+  const folderId  = folderEl?.value        || adminCurrentFolder || null;
 
-  btn.disabled = true;
-  btn.textContent = 'Subiendo...';
-  progressWrap.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressPct.textContent = '0%';
+  btn.disabled = true; btn.textContent = 'Subiendo...';
+  progressWrap.style.display='block'; progressBar.style.width='0%'; progressPct.textContent='0%';
 
   try {
-    const storageRef = firebase.storage().ref();
-    const fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    const fileRef = storageRef.child('documentos/' + fileName);
-    
-    const uploadTask = fileRef.put(file);
-    
-    await new Promise((resolve, reject) => {
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          progressBar.style.width = pct + '%';
-          progressPct.textContent = pct + '%';
+    const fileName  = Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9.]/g,'_');
+    const fileRef   = firebase.storage().ref().child('documentos/'+fileName);
+    const uploadTask= fileRef.put(file);
+
+    await new Promise((resolve,reject)=>{
+      uploadTask.on('state_changed',
+        snap => {
+          const pct = Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+          progressBar.style.width=pct+'%'; progressPct.textContent=pct+'%';
         },
-        (error) => reject(error),
+        err => reject(err),
         async () => {
           const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
-          
           const docId = genId();
-          const docRef = firebase.database().ref('unibartech/documents/' + docId);
-          await docRef.set({
-            name: finalName, desc, author, folderId,
+          await firebase.database().ref('unibartech/documents/'+docId).set({
+            name: finalName, desc, author,
+            folderId: folderId || null,
             downloadUrl,
-            size: (file.size / 1048576).toFixed(2) + ' MB', 
+            size: (file.size/1048576).toFixed(2)+' MB',
             ts: Date.now()
           });
-          
           resolve();
         }
       );
     });
 
-    if (nameEl) nameEl.value = '';
-    if (descEl) descEl.value = '';
-    if (authorEl) authorEl.value = '';
-    if (fileEl) fileEl.value = '';
-    if (fileLabel) fileLabel.textContent = '';
+    if (nameEl)  nameEl.value  = '';
+    if (descEl)  descEl.value  = '';
+    if (authorEl)authorEl.value= '';
+    if (fileEl)  fileEl.value  = '';
+    if (fileLabel)fileLabel.textContent='';
+    showToast('✅ "'+finalName+'" subido correctamente.');
 
-    showToast('✅ "' + finalName + '" subido correctamente.');
-
-  } catch (err) {
+  } catch(err) {
     console.error(err);
-    alert('❌ Error: ' + err.message);
+    alert('❌ Error al subir: '+err.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Subir Documento ↑';
-    setTimeout(() => {
-      progressWrap.style.display = 'none';
-      progressBar.style.width = '0%';
-      progressPct.textContent = '0%';
-    }, 2000);
+    btn.disabled=false; btn.textContent='Subir Documento ↑';
+    setTimeout(()=>{ progressWrap.style.display='none'; progressBar.style.width='0%'; progressPct.textContent='0%'; },2000);
   }
 }
 
-// ===== ELIMINAR CARPETA =====
+// ── Eliminar carpeta ──
 async function adminDeleteFolder(id) {
   if (!confirm('¿Eliminar carpeta y todos sus documentos?')) return;
-
-  const data = typeof getData === 'function' ? getData() : { documents: [] };
-  const docsInFolder = data.documents ? data.documents.filter(d => d.folderId === id) : [];
-
+  const docsInFolder = adminData.documents.filter(d=>d.folderId===id);
   for (const doc of docsInFolder) {
-    try {
-      if (doc.downloadUrl) {
-        const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
-        await fileRef.delete().catch(e => console.warn(e));
-      }
-    } catch (e) {}
-    await firebase.database().ref('unibartech/documents/' + doc.id).remove();
+    if (doc.downloadUrl) {
+      try { await firebase.storage().refFromURL(doc.downloadUrl).delete(); } catch(e){}
+    }
+    await firebase.database().ref('unibartech/documents/'+doc.id).remove();
   }
-  await firebase.database().ref('unibartech/folders/' + id).remove();
-
-  adminGoBack();
+  await firebase.database().ref('unibartech/folders/'+id).remove();
+  adminCurrentFolder=null;
   showToast('🗑️ Carpeta eliminada.');
 }
 
-// ===== ELIMINAR DOCUMENTO =====
+// ── Eliminar documento ──
 async function adminDeleteDoc(id) {
   if (!confirm('¿Eliminar este documento?')) return;
-  
-  const data = typeof getData === 'function' ? getData() : { documents: [] };
-  const doc = data.documents ? data.documents.find(d => d.id === id) : null;
-  
-  if (doc && doc.downloadUrl) {
-    try {
-      const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
-      await fileRef.delete().catch(e => console.warn(e));
-    } catch (e) {}
+  const doc = adminData.documents.find(d=>d.id===id);
+  if (doc?.downloadUrl) {
+    try { await firebase.storage().refFromURL(doc.downloadUrl).delete(); } catch(e){}
   }
-  
-  await firebase.database().ref('unibartech/documents/' + id).remove();
+  await firebase.database().ref('unibartech/documents/'+id).remove();
   showToast('🗑️ Documento eliminado.');
 }
 
-// ===== UPDATE FOLDER SELECT =====
-function updateFolderSelect() {
-  const sel = document.getElementById('targetFolder');
-  if (!sel) return;
-  const data = typeof getData === 'function' ? getData() : { folders: [] };
-  sel.innerHTML = '<option value="">— Sin carpeta (raíz) —</option>';
-  if (data.folders) {
-    data.folders.forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = f.id;
-      opt.textContent = f.name;
-      if (f.id === adminCurrentFolder) opt.selected = true;
-      sel.appendChild(opt);
+// ── Render content ──
+function adminRenderContent() {
+  const rows      = document.getElementById('adminContentRows');
+  const empty     = document.getElementById('adminEmpty');
+  const backBtn   = document.getElementById('adminBackBtn');
+  const breadcrumb= document.getElementById('adminBreadcrumb');
+  if (!rows) return;
+  rows.innerHTML='';
+
+  if (adminCurrentFolder===null) {
+    backBtn.style.display='none';
+    breadcrumb.textContent='UniBarTech S.A.S';
+    const rootDocs=adminData.documents.filter(d=>!d.folderId);
+    if (adminData.folders.length===0 && rootDocs.length===0) { empty.style.display=''; return; }
+    empty.style.display='none';
+    adminData.folders.forEach(f=>{
+      const count=adminData.documents.filter(d=>d.folderId===f.id).length;
+      const row=document.createElement('div');
+      row.className='admin-sp-row';
+      row.innerHTML=`
+        <div style="color:${folderColorHex(f.color)};font-size:1.4rem">📁</div>
+        <div style="flex:1">
+          <div class="admin-sp-row-name">${escHtml(f.name)}</div>
+          <div class="admin-sp-row-sub">${count} documento${count!==1?'s':''}</div>
+        </div>
+        <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>`;
+      row.addEventListener('click',e=>{
+        if(e.target.closest('.admin-del-btn')) return;
+        adminCurrentFolder=f.id; adminRenderContent(); updateFolderSelect();
+      });
+      rows.appendChild(row);
     });
+    rootDocs.forEach(doc=>renderAdminDocRow(doc,rows));
+  } else {
+    const folder=adminData.folders.find(f=>f.id===adminCurrentFolder);
+    backBtn.style.display='block';
+    breadcrumb.textContent='UniBarTech S.A.S › '+(folder?.name||'');
+    const docs=adminData.documents.filter(d=>d.folderId===adminCurrentFolder);
+    if (docs.length===0) { empty.style.display=''; return; }
+    empty.style.display='none';
+    docs.forEach(doc=>renderAdminDocRow(doc,rows));
   }
 }
 
-// ===== DRAG & DROP =====
+function renderAdminDocRow(doc,container) {
+  const row=document.createElement('div');
+  row.className='admin-sp-row';
+  const url=doc.downloadUrl||'';
+  row.innerHTML=`
+    <div style="font-size:1.4rem">📄</div>
+    <div style="flex:1">
+      <div class="admin-sp-row-name">${escHtml(doc.name)}</div>
+      <div class="admin-sp-row-sub">
+        ${doc.desc?escHtml(doc.desc)+' · ':''}${doc.size||''}
+        ${doc.author?' · Por: '+escHtml(doc.author):''} · ${formatDate(doc.ts)}
+      </div>
+    </div>
+    ${url?`<button class="sp-doc-btn" onclick="event.stopPropagation();window.open('${url}','_blank')" style="font-size:0.7rem;padding:5px 10px">Ver</button>`:''}
+    <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteDoc('${doc.id}')" title="Eliminar">🗑️</button>`;
+  container.appendChild(row);
+}
+
+function adminGoBack() { adminCurrentFolder=null; adminRenderContent(); updateFolderSelect(); }
+
+function updateFolderSelect() {
+  const sel=document.getElementById('targetFolder'); if (!sel) return;
+  sel.innerHTML='<option value="">— Sin carpeta (raíz) —</option>';
+  adminData.folders.forEach(f=>{
+    const opt=document.createElement('option');
+    opt.value=f.id; opt.textContent=f.name;
+    if(f.id===adminCurrentFolder) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Drag & Drop ──
 function dragOver(e) { e.preventDefault(); document.getElementById('fileDrop').classList.add('dragover'); }
 function dropFile(e) {
   e.preventDefault();
   document.getElementById('fileDrop').classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    document.getElementById('fileInput').files = dt.files;
-    updateFileName();
-  }
+  const file=e.dataTransfer.files[0];
+  if(file){ const dt=new DataTransfer(); dt.items.add(file); document.getElementById('fileInput').files=dt.files; updateFileName(); }
 }
-
 function updateFileName() {
-  const input = document.getElementById('fileInput');
-  const label = document.getElementById('fileLabel');
-  if (!input || !label) return;
-  label.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
+  const input=document.getElementById('fileInput');
+  const label=document.getElementById('fileLabel');
+  if(input&&label) label.textContent=input.files[0]?'📎 '+input.files[0].name:'';
 }
 
-// ===== FUNCIONES AUXILIARES =====
-function escHtml(text) { 
-  if (!text) return ''; 
-  const div = document.createElement('div'); 
-  div.textContent = text; 
-  return div.innerHTML; 
-}
-
-function formatDate(timestamp) { 
-  if (!timestamp) return 'Fecha desconocida'; 
-  return new Date(timestamp).toLocaleDateString(); 
-}
-
-function folderColorHex(color) {
-  const colors = { blue: '#0078D4', green: '#107C10', red: '#D13438', orange: '#CA5010', purple: '#5C2D91', teal: '#008272', gold: '#986F0B' };
-  return colors[color] || '#0078D4';
-}
-
-function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 6); }
-function showToast(msg) { alert(msg); }
-
-// ===== INICIALIZAR =====
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('✅ Panel de administración - Acceso directo');
-  setTimeout(() => {
-    if (typeof updateFolderSelect === 'function') updateFolderSelect();
-    if (typeof adminRenderContent === 'function') adminRenderContent();
-  }, 1000);
+// ── Enter en login ──
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('passInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 });
 </script>
 </body>
