@@ -56,7 +56,7 @@
     .admin-login-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
     .login-error { color: #ff6b6b; font-size: 0.8rem; min-height: 20px; margin-top: 8px; }
 
-    .admin-dash { display: none; padding-top: 80px; }
+    .admin-dash { display: block; padding-top: 80px; }
     .admin-top-bar {
       background: rgba(5,20,40,0.95);
       border-bottom: 1px solid rgba(0,170,255,0.15);
@@ -244,20 +244,8 @@
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="admin-login-screen" id="loginScreen">
-  <div class="admin-login-card">
-    <img src="logo.png" alt="UniBarTech"/>
-    <h2>Panel Administrador</h2>
-    <p>UniBarTech S.A.S — Acceso restringido</p>
-    <input type="password" id="adminPass" placeholder="Ingresa la contraseña" onkeydown="if(event.key==='Enter') checkAdmin()"/>
-    <button class="btn-primary" style="width:100%" onclick="checkAdmin()">Ingresar →</button>
-    <p class="login-error" id="loginError"></p>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="admin-dash" id="adminDash">
+<!-- DASHBOARD - ACCESO DIRECTO (SIN LOGIN) -->
+<div class="admin-dash" id="adminDash" style="display:block;">
 
   <nav id="navbar" style="display:block">
     <div class="nav-inner">
@@ -269,7 +257,7 @@
         <li><a href="documentos.html">Ver documentos públicos</a></li>
         <li><a href="index.html">Sitio web</a></li>
       </ul>
-      <button class="btn-ghost btn-sm" onclick="logoutAdmin()">Cerrar sesión</button>
+      <button class="btn-ghost btn-sm" onclick="if(confirm('¿Volver al login?')) location.reload()">Salir</button>
     </div>
   </nav>
 
@@ -277,7 +265,7 @@
     <div class="container">
 
       <div class="admin-top-bar">
-        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S</h3>
+        <h3>⚙️ PANEL DE ADMINISTRACIÓN — UniBarTech S.A.S (ACCESO DIRECTO)</h3>
         <div style="display:flex;gap:10px;align-items:center">
           <span id="adminBreadcrumb" style="font-size:0.75rem;color:var(--gray);font-family:var(--font-head)">UniBarTech S.A.S</span>
         </div>
@@ -356,7 +344,7 @@
   </main>
 </div>
 
-<!-- Firebase SDKs - TODOS LOS SDKs NECESARIOS -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
@@ -366,150 +354,83 @@
 
 <script>
 // ════════════════════════════════════════════
-//  LÓGICA EXCLUSIVA DEL PANEL DE ADMIN
+//  PANEL DE ADMIN - SIN CONTRASEÑA
 // ════════════════════════════════════════════
 
-// ===== CONFIGURACIÓN =====
-const ADMIN_PASS = "admin123"; // ← CONTRASEÑA CORRECTA: admin123
 let selectedColor = 'blue';
-let adminCurrentFolder = null; // null = raíz
-
-// ===== FUNCIÓN DE LOGIN CON DEPURACIÓN =====
-function checkAdmin() {
-  // Obtener elementos del DOM
-  const input = document.getElementById('adminPass');
-  const error = document.getElementById('loginError');
-  const loginScreen = document.getElementById('loginScreen');
-  const adminDash = document.getElementById('adminDash');
-  
-  // Verificar que los elementos existen
-  if (!input || !error || !loginScreen || !adminDash) {
-    console.error('Error: No se encontraron elementos del DOM');
-    return;
-  }
-  
-  // Obtener valores
-  const passwordIngresada = input.value;
-  const passwordEsperada = ADMIN_PASS;
-  
-  // Mostrar información en consola para depurar
-  console.log('========== INTENTO DE LOGIN ==========');
-  console.log('Contraseña ingresada:', passwordIngresada);
-  console.log('Contraseña esperada:', passwordEsperada);
-  console.log('Longitud ingresada:', passwordIngresada.length);
-  console.log('Longitud esperada:', passwordEsperada.length);
-  console.log('¿Coinciden?', passwordIngresada === passwordEsperada);
-  console.log('======================================');
-  
-  // Comparar contraseñas
-  if (passwordIngresada === passwordEsperada) {
-    // Login exitoso
-    loginScreen.style.display = 'none';
-    adminDash.style.display = 'block';
-    
-    // Actualizar datos
-    if (typeof updateFolderSelect === 'function') updateFolderSelect();
-    if (typeof adminRenderContent === 'function') adminRenderContent();
-    
-    console.log('✅ LOGIN EXITOSO - Bienvenido al panel de administración');
-  } else {
-    // Login fallido
-    error.textContent = '❌ Contraseña incorrecta';
-    input.value = '';
-    input.focus();
-    
-    // Limpiar mensaje después de 3 segundos
-    setTimeout(() => {
-      error.textContent = '';
-    }, 3000);
-    
-    console.log('❌ LOGIN FALLIDO - Contraseña incorrecta');
-  }
-}
-
-// Permitir login con tecla Enter (ya está en el HTML pero lo reforzamos)
-document.addEventListener('DOMContentLoaded', function() {
-  const input = document.getElementById('adminPass');
-  if (input) {
-    input.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        checkAdmin();
-      }
-    });
-  }
-  console.log('✅ Panel de administración cargado - Usa la contraseña: admin123');
-});
+let adminCurrentFolder = null;
 
 // ===== LOGOUT =====
 function logoutAdmin() {
-  if (confirm('¿Cerrar sesión de administrador?')) {
-    document.getElementById('adminDash').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('adminPass').value = '';
-    console.log('👋 Sesión cerrada');
+  if (confirm('¿Cerrar sesión?')) {
+    location.reload();
   }
 }
 
-// ── Color selector ──────────────────────────
+// ===== COLOR SELECTOR =====
 function selectColor(el) {
   document.querySelectorAll('.color-opt').forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
   selectedColor = el.dataset.color;
 }
 
-// ── Render panel admin ──────────────────────
+// ===== RENDER CONTENT =====
 function adminRenderContent() {
-  const data     = getData();
-  const rows     = document.getElementById('adminContentRows');
-  const empty    = document.getElementById('adminEmpty');
-  const backBtn  = document.getElementById('adminBackBtn');
+  const data = typeof getData === 'function' ? getData() : { folders: [], documents: [] };
+  const rows = document.getElementById('adminContentRows');
+  const empty = document.getElementById('adminEmpty');
+  const backBtn = document.getElementById('adminBackBtn');
   const breadcrumb = document.getElementById('adminBreadcrumb');
+  
   if (!rows) return;
   rows.innerHTML = '';
 
   if (adminCurrentFolder === null) {
-    backBtn.style.display   = 'none';
-    breadcrumb.textContent  = 'UniBarTech S.A.S';
+    backBtn.style.display = 'none';
+    breadcrumb.textContent = 'UniBarTech S.A.S';
 
-    const rootDocs = data.documents.filter(d => !d.folderId);
-    if (data.folders.length === 0 && rootDocs.length === 0) {
+    const rootDocs = data.documents ? data.documents.filter(d => !d.folderId) : [];
+    
+    if ((!data.folders || data.folders.length === 0) && rootDocs.length === 0) {
       empty.style.display = '';
       return;
     }
     empty.style.display = 'none';
 
-    data.folders.forEach(f => {
-      const count = data.documents.filter(d => d.folderId === f.id).length;
-      const row   = document.createElement('div');
-      row.className = 'admin-sp-row';
-      row.innerHTML = `
-        <div style="color:${folderColorHex(f.color)};font-size:1.4rem;width:28px;height:28px">📁</div>
-        <div style="flex:1">
-          <div class="admin-sp-row-name">${escHtml(f.name)}</div>
-          <div class="admin-sp-row-sub">${count} documento${count !== 1 ? 's' : ''}</div>
-        </div>
-        <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>
-      `;
-      row.addEventListener('click', e => {
-        if (e.target.closest('.admin-del-btn')) return;
-        adminCurrentFolder = f.id;
-        adminRenderContent();
-        updateFolderSelect();
+    if (data.folders) {
+      data.folders.forEach(f => {
+        const count = data.documents ? data.documents.filter(d => d.folderId === f.id).length : 0;
+        const row = document.createElement('div');
+        row.className = 'admin-sp-row';
+        row.innerHTML = `
+          <div style="color:${folderColorHex(f.color)};font-size:1.4rem;width:28px;height:28px">📁</div>
+          <div style="flex:1">
+            <div class="admin-sp-row-name">${escHtml(f.name)}</div>
+            <div class="admin-sp-row-sub">${count} documento${count !== 1 ? 's' : ''}</div>
+          </div>
+          <button class="admin-del-btn" onclick="event.stopPropagation();adminDeleteFolder('${f.id}')" title="Eliminar">🗑️</button>
+        `;
+        row.addEventListener('click', e => {
+          if (e.target.closest('.admin-del-btn')) return;
+          adminCurrentFolder = f.id;
+          adminRenderContent();
+          updateFolderSelect();
+        });
+        rows.appendChild(row);
       });
-      rows.appendChild(row);
-    });
+    }
 
     rootDocs.forEach(doc => renderAdminDocRow(doc, rows));
 
   } else {
-    const folder = data.folders.find(f => f.id === adminCurrentFolder);
-    backBtn.style.display  = 'block';
+    const folder = data.folders ? data.folders.find(f => f.id === adminCurrentFolder) : null;
+    backBtn.style.display = 'block';
     breadcrumb.textContent = 'UniBarTech S.A.S › ' + (folder?.name || '');
 
-    const docs = data.documents.filter(d => d.folderId === adminCurrentFolder);
-    if (docs.length === 0) { empty.style.display = ''; }
-    else {
+    const docs = data.documents ? data.documents.filter(d => d.folderId === adminCurrentFolder) : [];
+    if (docs.length === 0) { 
+      empty.style.display = ''; 
+    } else {
       empty.style.display = 'none';
       docs.forEach(doc => renderAdminDocRow(doc, rows));
     }
@@ -544,13 +465,18 @@ function adminGoBack() {
   updateFolderSelect();
 }
 
-// ── Crear carpeta ───────────────────────────
+// ===== CREAR CARPETA =====
 async function adminCreateFolder() {
+  if (typeof firebase === 'undefined') {
+    alert('Firebase no está inicializado');
+    return;
+  }
+  
   const nameEl = document.getElementById('newFolderName');
-  const name   = nameEl?.value.trim();
+  const name = nameEl?.value.trim();
   if (!name) { alert('Escribe el nombre de la carpeta.'); return; }
 
-  const id  = genId();
+  const id = genId();
   const ref = firebase.database().ref('unibartech/folders/' + id);
   await ref.set({ name, color: selectedColor, ts: Date.now() });
 
@@ -558,29 +484,28 @@ async function adminCreateFolder() {
   showToast('✅ Carpeta "' + name + '" creada.');
 }
 
-// ── Subir documento a Firebase Storage ─────
+// ===== SUBIR DOCUMENTO =====
 async function adminUploadDoc() {
-  const nameEl   = document.getElementById('docName');
-  const descEl   = document.getElementById('docDesc');
+  const nameEl = document.getElementById('docName');
+  const descEl = document.getElementById('docDesc');
   const authorEl = document.getElementById('docAuthor');
   const folderEl = document.getElementById('targetFolder');
-  const fileEl   = document.getElementById('fileInput');
+  const fileEl = document.getElementById('fileInput');
   const fileLabel = document.getElementById('fileLabel');
-  const btn       = document.getElementById('uploadBtn');
+  const btn = document.getElementById('uploadBtn');
   const progressWrap = document.getElementById('uploadProgressWrap');
-  const progressBar  = document.getElementById('uploadProgressBar');
-  const progressPct  = document.getElementById('uploadProgressPct');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const progressPct = document.getElementById('uploadProgressPct');
 
   const file = fileEl?.files[0] || null;
   if (!file) { alert('Selecciona un archivo para subir.'); return; }
   if (file.size > 50 * 1048576) { alert('Archivo demasiado grande. Máximo 50 MB.'); return; }
 
   const finalName = nameEl?.value.trim() || file.name;
-  const desc      = descEl?.value.trim()   || '';
-  const author    = authorEl?.value.trim() || 'Administrador';
-  const folderId  = folderEl?.value        || adminCurrentFolder || null;
+  const desc = descEl?.value.trim() || '';
+  const author = authorEl?.value.trim() || 'Administrador';
+  const folderId = folderEl?.value || adminCurrentFolder || null;
 
-  // Mostrar progreso
   btn.disabled = true;
   btn.textContent = 'Subiendo...';
   progressWrap.style.display = 'block';
@@ -588,19 +513,12 @@ async function adminUploadDoc() {
   progressPct.textContent = '0%';
 
   try {
-    // Verificar que storage está disponible
-    if (typeof firebase.storage !== 'function') {
-      throw new Error('Firebase Storage no está inicializado. Verifica los SDKs.');
-    }
-
-    // Subir a Firebase Storage
     const storageRef = firebase.storage().ref();
     const fileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_');
     const fileRef = storageRef.child('documentos/' + fileName);
     
     const uploadTask = fileRef.put(file);
     
-    // Escuchar progreso
     await new Promise((resolve, reject) => {
       uploadTask.on('state_changed', 
         (snapshot) => {
@@ -610,17 +528,12 @@ async function adminUploadDoc() {
         },
         (error) => reject(error),
         async () => {
-          // Subida completada, obtener URL
           const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL();
           
-          // Guardar metadata en Realtime Database
-          const docId  = genId();
+          const docId = genId();
           const docRef = firebase.database().ref('unibartech/documents/' + docId);
           await docRef.set({
-            name: finalName, 
-            desc, 
-            author, 
-            folderId,
+            name: finalName, desc, author, folderId,
             downloadUrl,
             size: (file.size / 1048576).toFixed(2) + ' MB', 
             ts: Date.now()
@@ -631,47 +544,42 @@ async function adminUploadDoc() {
       );
     });
 
-    // Limpiar formulario
-    if (nameEl)   nameEl.value   = '';
-    if (descEl)   descEl.value   = '';
+    if (nameEl) nameEl.value = '';
+    if (descEl) descEl.value = '';
     if (authorEl) authorEl.value = '';
-    if (fileEl)   fileEl.value   = '';
+    if (fileEl) fileEl.value = '';
     if (fileLabel) fileLabel.textContent = '';
 
     showToast('✅ "' + finalName + '" subido correctamente.');
 
   } catch (err) {
-    console.error('Error detallado:', err);
-    alert('❌ Error al subir el archivo: ' + err.message);
+    console.error(err);
+    alert('❌ Error: ' + err.message);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Subir Documento ↑';
     setTimeout(() => {
       progressWrap.style.display = 'none';
       progressBar.style.width = '0%';
-      progressPct.textContent  = '0%';
+      progressPct.textContent = '0%';
     }, 2000);
   }
 }
 
-// ── Eliminar carpeta ────────────────────────
+// ===== ELIMINAR CARPETA =====
 async function adminDeleteFolder(id) {
   if (!confirm('¿Eliminar carpeta y todos sus documentos?')) return;
 
-  const data = getData();
-  const docsInFolder = data.documents.filter(d => d.folderId === id);
+  const data = typeof getData === 'function' ? getData() : { documents: [] };
+  const docsInFolder = data.documents ? data.documents.filter(d => d.folderId === id) : [];
 
-  // Eliminar archivos en Storage
   for (const doc of docsInFolder) {
     try {
       if (doc.downloadUrl) {
-        // Extraer el path de la URL
         const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
-        await fileRef.delete().catch(e => console.warn('Error eliminando archivo:', e));
+        await fileRef.delete().catch(e => console.warn(e));
       }
-    } catch (e) {
-      console.warn('Error eliminando archivo de Storage:', e);
-    }
+    } catch (e) {}
     await firebase.database().ref('unibartech/documents/' + doc.id).remove();
   }
   await firebase.database().ref('unibartech/folders/' + id).remove();
@@ -680,46 +588,43 @@ async function adminDeleteFolder(id) {
   showToast('🗑️ Carpeta eliminada.');
 }
 
-// ── Eliminar documento ──────────────────────
+// ===== ELIMINAR DOCUMENTO =====
 async function adminDeleteDoc(id) {
   if (!confirm('¿Eliminar este documento?')) return;
   
-  const data = getData();
-  const doc = data.documents.find(d => d.id === id);
+  const data = typeof getData === 'function' ? getData() : { documents: [] };
+  const doc = data.documents ? data.documents.find(d => d.id === id) : null;
   
   if (doc && doc.downloadUrl) {
     try {
       const fileRef = firebase.storage().refFromURL(doc.downloadUrl);
-      await fileRef.delete().catch(e => console.warn('Error eliminando archivo:', e));
-    } catch (e) {
-      console.warn('Error eliminando archivo de Storage:', e);
-    }
+      await fileRef.delete().catch(e => console.warn(e));
+    } catch (e) {}
   }
   
   await firebase.database().ref('unibartech/documents/' + id).remove();
   showToast('🗑️ Documento eliminado.');
 }
 
-// ── Actualizar selector de carpetas ────────
+// ===== UPDATE FOLDER SELECT =====
 function updateFolderSelect() {
   const sel = document.getElementById('targetFolder');
   if (!sel) return;
-  const data = getData();
+  const data = typeof getData === 'function' ? getData() : { folders: [] };
   sel.innerHTML = '<option value="">— Sin carpeta (raíz) —</option>';
-  data.folders.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f.id;
-    opt.textContent = f.name;
-    if (f.id === adminCurrentFolder) opt.selected = true;
-    sel.appendChild(opt);
-  });
+  if (data.folders) {
+    data.folders.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = f.name;
+      if (f.id === adminCurrentFolder) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
 }
 
-// ── Drag & drop ─────────────────────────────
-function dragOver(e) {
-  e.preventDefault();
-  document.getElementById('fileDrop').classList.add('dragover');
-}
+// ===== DRAG & DROP =====
+function dragOver(e) { e.preventDefault(); document.getElementById('fileDrop').classList.add('dragover'); }
 function dropFile(e) {
   e.preventDefault();
   document.getElementById('fileDrop').classList.remove('dragover');
@@ -732,7 +637,6 @@ function dropFile(e) {
   }
 }
 
-// Actualizar nombre de archivo seleccionado
 function updateFileName() {
   const input = document.getElementById('fileInput');
   const label = document.getElementById('fileLabel');
@@ -740,35 +644,35 @@ function updateFileName() {
   label.textContent = input.files[0] ? '📎 ' + input.files[0].name : '';
 }
 
-// Funciones auxiliares (por si no están en firebase-config.js)
-if (typeof escHtml === 'undefined') {
-  function escHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+// ===== FUNCIONES AUXILIARES =====
+function escHtml(text) { 
+  if (!text) return ''; 
+  const div = document.createElement('div'); 
+  div.textContent = text; 
+  return div.innerHTML; 
 }
 
-if (typeof formatDate === 'undefined') {
-  function formatDate(timestamp) {
-    if (!timestamp) return 'Fecha desconocida';
-    const date = new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  }
+function formatDate(timestamp) { 
+  if (!timestamp) return 'Fecha desconocida'; 
+  return new Date(timestamp).toLocaleDateString(); 
 }
 
-if (typeof genId === 'undefined') {
-  function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
-  }
+function folderColorHex(color) {
+  const colors = { blue: '#0078D4', green: '#107C10', red: '#D13438', orange: '#CA5010', purple: '#5C2D91', teal: '#008272', gold: '#986F0B' };
+  return colors[color] || '#0078D4';
 }
 
-if (typeof showToast === 'undefined') {
-  function showToast(msg) {
-    alert(msg);
-  }
-}
+function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 6); }
+function showToast(msg) { alert(msg); }
+
+// ===== INICIALIZAR =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('✅ Panel de administración - Acceso directo');
+  setTimeout(() => {
+    if (typeof updateFolderSelect === 'function') updateFolderSelect();
+    if (typeof adminRenderContent === 'function') adminRenderContent();
+  }, 1000);
+});
 </script>
 </body>
 </html>
