@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyBz7LhVAPB8vLmzR1cV9nX5kQ2wL3mN4oP5",   // ← TU API KEY
+  apiKey:            "AIzaSyBz7LhVAPB8vLmzR1cV9nX5kQ2wL3mN4oP5",
   authDomain:        "unibartech-web.firebaseapp.com",
   databaseURL:       "https://unibartech-web-default-rtdb.firebaseio.com",
   projectId:         "unibartech-web",
